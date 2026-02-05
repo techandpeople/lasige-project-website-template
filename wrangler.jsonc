@@ -1,6 +1,6 @@
 {
 	"main": "dist/_worker.js/index.js",
-	"name": "site-template",
+	"name": "lasige-project-template",
   "compatibility_date": "2026-02-05",
   "compatibility_flags": [
     "nodejs_compat",
