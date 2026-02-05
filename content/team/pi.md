@@ -1,7 +1,7 @@
 ---
 name: "Name"
 role: "Principal Investigator"
-photo: "/images/team/pi.jpg"
+# photo: "/images/team/pi.jpg"
 institution: "LASIGE, FCUL"
 order: 1
 links:

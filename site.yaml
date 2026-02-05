@@ -33,12 +33,12 @@ colors:
 
 # -- Navegacao --
 navigation:
-  logo: "/images/logo.png"
+  # logo: "/images/logo.png"
 
 # -- Seccao Hero (banner principal) --
 hero:
   # backgroundImage: "/images/hero-bg.jpg"
-  logo: "/images/project-logo.png"
+  # logo: "/images/project-logo.png"
   title: "Project Full Name"
   subtitle: "A brief subtitle describing the project mission"
   cta:
@@ -62,7 +62,7 @@ funding:
 
 # -- Rodape --
 footer:
-  institutionLogo: "/images/lasige-logo.png"
+  # institutionLogo: "/images/lasige-logo.png"
   institutionUrl: "https://www.lasige.pt"
   contactEmail: "project@example.com"
   copyright: "LASIGE, Faculdade de Ciencias, Universidade de Lisboa"

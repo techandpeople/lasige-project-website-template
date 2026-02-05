@@ -1,6 +1,7 @@
 ---
 import site from '../../site.yaml';
-const { footer, project } = site;
+const footer = site.footer || {};
+const { project } = site;
 ---
 <footer class="bg-primary text-white py-12">
 	<div class="max-w-6xl mx-auto px-4">

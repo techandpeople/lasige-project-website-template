@@ -10,9 +10,13 @@
 				const navbarHeight = document.getElementById('navbar')?.offsetHeight || 64;
 				const top = target.getBoundingClientRect().top + window.scrollY - navbarHeight;
 				window.scrollTo({ top, behavior: 'smooth' });
+				history.replaceState(null, '', href);
 			}
 			// Close mobile menu if open
-			document.getElementById('mobile-menu')?.classList.add('hidden');
+			const menu = document.getElementById('mobile-menu');
+			const toggle = document.getElementById('menu-toggle');
+			menu?.classList.remove('open');
+			toggle?.classList.remove('open');
 		});
 	});
 

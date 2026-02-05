@@ -39,7 +39,7 @@ navItems.sort((a, b) => a.order - b.order);
 <nav id="navbar" class="fixed top-0 w-full z-50 bg-white/90 backdrop-blur-md shadow-sm">
 	<div class="max-w-6xl mx-auto px-4 flex items-center justify-between h-16">
 		<a href="#hero" class="flex items-center gap-2">
-			{navigation.logo && (
+			{navigation?.logo && (
 				<img src={navigation.logo} alt={project.name} class="h-8" />
 			)}
 			<span class="font-bold text-primary text-lg">{project.name}</span>
@@ -60,7 +60,7 @@ navItems.sort((a, b) => a.order - b.order);
 
 		<button
 			id="menu-toggle"
-			class="hamburger md:hidden p-2 text-body hover:text-primary"
+			class="hamburger p-2 text-body hover:text-primary"
 			aria-label="Toggle menu"
 		>
 			<span></span>
@@ -126,6 +126,9 @@ navItems.sort((a, b) => a.order - b.order);
 		border-top: 1px solid #e5e7eb;
 	}
 	@media (min-width: 48rem) {
+		.hamburger {
+			display: none;
+		}
 		.mobile-menu {
 			display: none;
 		}
