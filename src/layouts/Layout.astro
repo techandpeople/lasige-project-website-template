@@ -1,23 +1,32 @@
+---
+import site from '../../site.yaml';
+import '../styles/global.css';
+
+const { project, colors } = site;
+---
 <!doctype html>
-<html lang="en">
+<html lang={project.language || 'en'}>
 	<head>
 		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<link rel="icon" href="/favicon.ico" />
 		<meta name="generator" content={Astro.generator} />
-		<title>Astro Basics</title>
+		<meta name="description" content={project.description} />
+		<title>{project.name}</title>
 	</head>
-	<body>
+	<body class="bg-background text-body antialiased">
+		<Fragment set:html={`<style>
+			:root {
+				--color-primary: ${colors.primary};
+				--color-secondary: ${colors.secondary};
+				--color-accent: ${colors.accent};
+				--color-background: ${colors.background};
+				--color-surface: ${colors.surface};
+				--color-text: ${colors.text};
+				--color-text-light: ${colors.textLight};
+			}
+		</style>`} />
 		<slot />
 	</body>
 </html>
-
-<style>
-	html,
-	body {
-		margin: 0;
-		width: 100%;
-		height: 100%;
-	}
-</style>

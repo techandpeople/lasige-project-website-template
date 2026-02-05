@@ -1,0 +1,29 @@
+---
+interface Props {
+	funder: {
+		name: string;
+		logo?: string;
+		url?: string;
+		grant?: string;
+	};
+}
+
+const { funder } = Astro.props;
+const Tag = funder.url ? 'a' : 'div';
+---
+<Tag
+	{...(funder.url ? { href: funder.url, target: "_blank", rel: "noopener noreferrer" } : {})}
+	class="flex flex-col items-center p-6 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow text-center"
+>
+	{funder.logo ? (
+		<img src={funder.logo} alt={funder.name} class="h-16 mb-4 object-contain" />
+	) : (
+		<div class="h-16 mb-4 flex items-center justify-center">
+			<span class="text-primary font-bold text-lg">{funder.name}</span>
+		</div>
+	)}
+	<h3 class="font-semibold text-body text-sm">{funder.name}</h3>
+	{funder.grant && (
+		<p class="text-muted text-xs mt-1">{funder.grant}</p>
+	)}
+</Tag>

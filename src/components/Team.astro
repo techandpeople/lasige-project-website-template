@@ -1,0 +1,24 @@
+---
+import { getCollection } from 'astro:content';
+import site from '../../site.yaml';
+import TeamCard from './TeamCard.astro';
+
+const members = await getCollection('team');
+const sorted = [...members].sort((a, b) => a.data.order - b.data.order);
+const title = site.team?.title || 'Team';
+---
+{sorted.length > 0 && (
+	<section id="team" class="py-20">
+		<div class="max-w-6xl mx-auto px-4">
+			<h2 class="text-3xl md:text-4xl font-bold text-primary mb-12 text-center">
+				{title}
+			</h2>
+
+			<div class="flex flex-wrap justify-center gap-4">
+				{sorted.map((entry) => (
+					<TeamCard member={entry.data} />
+				))}
+			</div>
+		</div>
+	</section>
+)}

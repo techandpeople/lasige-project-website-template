@@ -1,0 +1,150 @@
+---
+import { getCollection } from 'astro:content';
+import site from '../../site.yaml';
+
+const { navigation, project } = site;
+
+// Build nav items automatically from all content collections
+const contentSections = await getCollection('sections');
+const teamMembers = await getCollection('team');
+const funderEntries = await getCollection('funders');
+
+type NavItem = { label: string; href: string; order: number };
+const navItems: NavItem[] = [
+	{ label: 'Home', href: '#hero', order: 0 },
+	...contentSections.map((s: { id: string; data: { navLabel?: string; title: string; order: number } }) => ({
+		label: s.data.navLabel || s.data.title,
+		href: `#${s.id}`,
+		order: s.data.order,
+	})),
+];
+
+if (teamMembers.length > 0) {
+	navItems.push({
+		label: site.team?.navLabel || site.team?.title || 'Team',
+		href: '#team',
+		order: site.team?.order ?? 90,
+	});
+}
+if (funderEntries.length > 0) {
+	navItems.push({
+		label: site.funding?.navLabel || site.funding?.title || 'Funding',
+		href: '#funding',
+		order: site.funding?.order ?? 95,
+	});
+}
+
+navItems.sort((a, b) => a.order - b.order);
+---
+<nav id="navbar" class="fixed top-0 w-full z-50 bg-white/90 backdrop-blur-md shadow-sm">
+	<div class="max-w-6xl mx-auto px-4 flex items-center justify-between h-16">
+		<a href="#hero" class="flex items-center gap-2">
+			{navigation.logo && (
+				<img src={navigation.logo} alt={project.name} class="h-8" />
+			)}
+			<span class="font-bold text-primary text-lg">{project.name}</span>
+		</a>
+
+		<ul class="hidden md:flex gap-6">
+			{navItems.map((item) => (
+				<li>
+					<a
+						href={item.href}
+						class="nav-link text-body hover:text-primary transition-colors font-medium"
+					>
+						{item.label}
+					</a>
+				</li>
+			))}
+		</ul>
+
+		<button
+			id="menu-toggle"
+			class="hamburger md:hidden p-2 text-body hover:text-primary"
+			aria-label="Toggle menu"
+		>
+			<span></span>
+			<span></span>
+			<span></span>
+		</button>
+	</div>
+
+	<div id="mobile-menu" class="mobile-menu bg-white">
+		<ul class="flex flex-col p-4 gap-2">
+			{navItems.map((item) => (
+				<li>
+					<a
+						href={item.href}
+						class="nav-link block py-2 text-body hover:text-primary transition-colors font-medium"
+					>
+						{item.label}
+					</a>
+				</li>
+			))}
+		</ul>
+	</div>
+</nav>
+
+<style>
+	/* Hamburger icon */
+	.hamburger {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		gap: 5px;
+		width: 2.5rem;
+		height: 2.5rem;
+		cursor: pointer;
+	}
+	.hamburger span {
+		display: block;
+		width: 22px;
+		height: 2px;
+		background: currentColor;
+		border-radius: 1px;
+		transition: transform 0.3s ease, opacity 0.3s ease;
+		margin: 0 auto;
+	}
+	.hamburger.open span:nth-child(1) {
+		transform: translateY(7px) rotate(45deg);
+	}
+	.hamburger.open span:nth-child(2) {
+		opacity: 0;
+	}
+	.hamburger.open span:nth-child(3) {
+		transform: translateY(-7px) rotate(-45deg);
+	}
+
+	/* Mobile menu */
+	.mobile-menu {
+		max-height: 0;
+		overflow: hidden;
+		transition: max-height 0.3s ease-out;
+	}
+	.mobile-menu.open {
+		max-height: 20rem;
+		border-top: 1px solid #e5e7eb;
+	}
+	@media (min-width: 48rem) {
+		.mobile-menu {
+			display: none;
+		}
+	}
+</style>
+
+<script>
+	const toggle = document.getElementById('menu-toggle');
+	const menu = document.getElementById('mobile-menu');
+
+	toggle?.addEventListener('click', () => {
+		toggle.classList.toggle('open');
+		menu?.classList.toggle('open');
+	});
+
+	document.querySelectorAll('#mobile-menu a').forEach(link => {
+		link.addEventListener('click', () => {
+			toggle?.classList.remove('open');
+			menu?.classList.remove('open');
+		});
+	});
+</script>

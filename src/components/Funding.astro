@@ -1,0 +1,29 @@
+---
+import { getCollection } from 'astro:content';
+import site from '../../site.yaml';
+import FunderCard from './FunderCard.astro';
+
+const funders = await getCollection('funders');
+const sorted = [...funders].sort((a, b) => a.data.order - b.data.order);
+const title = site.funding?.title || 'Funding';
+const description = site.funding?.description;
+---
+{sorted.length > 0 && (
+	<section id="funding" class="py-20 bg-surface">
+		<div class="max-w-6xl mx-auto px-4">
+			<h2 class="text-3xl md:text-4xl font-bold text-primary mb-4 text-center">
+				{title}
+			</h2>
+
+			{description && (
+				<p class="text-muted text-lg text-center mb-12">{description}</p>
+			)}
+
+			<div class="flex flex-wrap justify-center gap-8">
+				{sorted.map((entry) => (
+					<FunderCard funder={entry.data} />
+				))}
+			</div>
+		</div>
+	</section>
+)}

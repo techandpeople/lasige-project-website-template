@@ -1,0 +1,45 @@
+---
+import site from '../../site.yaml';
+const { hero } = site;
+---
+<section id="hero" class="relative min-h-screen flex items-center justify-center text-center px-4 pt-16">
+	{hero.backgroundImage && (
+		<div class="absolute inset-0 z-0">
+			<img src={hero.backgroundImage} alt="" class="w-full h-full object-cover" />
+			<div class="absolute inset-0 bg-primary/70"></div>
+		</div>
+	)}
+
+	<div class="relative z-10 max-w-3xl">
+		{hero.logo && (
+			<img
+				src={hero.logo}
+				alt={hero.title}
+				class="mx-auto mb-8 max-h-32"
+			/>
+		)}
+
+		<h1 class:list={[
+			"text-4xl md:text-6xl font-bold mb-4",
+			hero.backgroundImage ? "text-white" : "text-primary"
+		]}>
+			{hero.title}
+		</h1>
+
+		<p class:list={[
+			"text-xl md:text-2xl mb-8",
+			hero.backgroundImage ? "text-white/90" : "text-muted"
+		]}>
+			{hero.subtitle}
+		</p>
+
+		{hero.cta && (
+			<a
+				href={hero.cta.href}
+				class="inline-block px-8 py-3 bg-accent text-white rounded-lg font-semibold hover:opacity-90 transition-opacity text-lg"
+			>
+				{hero.cta.label}
+			</a>
+		)}
+	</div>
+</section>

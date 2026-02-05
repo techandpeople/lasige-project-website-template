@@ -1,11 +1,64 @@
 ---
-import Welcome from '../components/Welcome.astro';
+import { getCollection, render } from 'astro:content';
+import site from '../../site.yaml';
 import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/Navbar.astro';
+import Hero from '../components/Hero.astro';
+import Section from '../components/Section.astro';
+import Team from '../components/Team.astro';
+import Funding from '../components/Funding.astro';
+import Footer from '../components/Footer.astro';
+import SmoothScroll from '../components/SmoothScroll.astro';
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+// Load all content and build page blocks sorted by order
+const contentSections = await getCollection('sections');
+const teamMembers = await getCollection('team');
+const funderEntries = await getCollection('funders');
+
+type PageBlock =
+	| { type: 'content'; entry: (typeof contentSections)[number]; order: number }
+	| { type: 'team'; order: number }
+	| { type: 'funding'; order: number };
+
+const blocks: PageBlock[] = [
+	...contentSections.map((entry: (typeof contentSections)[number]) => ({
+		type: 'content' as const,
+		entry,
+		order: entry.data.order,
+	})),
+];
+
+if (teamMembers.length > 0) {
+	blocks.push({ type: 'team', order: site.team?.order ?? 90 });
+}
+if (funderEntries.length > 0) {
+	blocks.push({ type: 'funding', order: site.funding?.order ?? 95 });
+}
+
+blocks.sort((a, b) => a.order - b.order);
 ---
 
 <Layout>
-	<Welcome />
+	<Navbar />
+	<main>
+		<Hero />
+		{blocks.map(async (block) => {
+			if (block.type === 'content') {
+				const { Content } = await render(block.entry);
+				return (
+					<Section
+						id={block.entry.id}
+						title={block.entry.data.title}
+						background={block.entry.data.background}
+					>
+						<Content />
+					</Section>
+				);
+			}
+			if (block.type === 'team') return <Team />;
+			if (block.type === 'funding') return <Funding />;
+		})}
+	</main>
+	<Footer />
+	<SmoothScroll />
 </Layout>

@@ -1,0 +1,71 @@
+# ============================================================
+# LASIGE Project Website Configuration
+# ============================================================
+# Edite este ficheiro para personalizar o site do seu projeto.
+#
+# Imagens: coloque na pasta public/images/ e use o caminho
+#   relativo (ex: /images/team/foto.jpg)
+#
+# Conteudo: adicione ficheiros .md nas pastas dentro de content/
+#   content/sections/  — seccoes de texto (about, objectives, ...)
+#   content/team/      — membros da equipa (um ficheiro por pessoa)
+#   content/funders/   — financiadores (um ficheiro por entidade)
+#
+# Todas as seccoes sao opcionais e aparecem automaticamente.
+# ============================================================
+
+# -- Metadata do Projeto --
+project:
+  name: "Project Name"
+  tagline: "Your project tagline"
+  description: "Brief project description for search engines."
+  language: "en"
+
+# -- Cores --
+colors:
+  primary: "#1a5276"
+  secondary: "#2980b9"
+  accent: "#e74c3c"
+  background: "#ffffff"
+  surface: "#f8f9fa"
+  text: "#1f2937"
+  textLight: "#6b7280"
+
+# -- Navegacao --
+navigation:
+  logo: "/images/logo.png"
+
+# -- Seccao Hero (banner principal) --
+hero:
+  # backgroundImage: "/images/hero-bg.jpg"
+  logo: "/images/project-logo.png"
+  title: "Project Full Name"
+  subtitle: "A brief subtitle describing the project mission"
+  cta:
+    label: "Learn More"
+    href: "#about"
+
+# -- Equipa (opcional) --
+# Os membros sao definidos em content/team/*.md
+# Aqui pode configurar o titulo e posicao da seccao.
+team:
+  title: "Team"
+  order: 90
+
+# -- Financiamento (opcional) --
+# Os financiadores sao definidos em content/funders/*.md
+# Aqui pode configurar o titulo, descricao e posicao da seccao.
+funding:
+  title: "Funding"
+  description: "This project is funded by:"
+  order: 95
+
+# -- Rodape --
+footer:
+  institutionLogo: "/images/lasige-logo.png"
+  institutionUrl: "https://www.lasige.pt"
+  contactEmail: "project@example.com"
+  copyright: "LASIGE, Faculdade de Ciencias, Universidade de Lisboa"
+  socialLinks:
+    github: "https://github.com/your-org"
+    # twitter: "https://twitter.com/handle"
