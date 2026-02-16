@@ -1,27 +1,30 @@
 # ============================================================
 # LASIGE Project Website Configuration
 # ============================================================
-# Edite este ficheiro para personalizar o site do seu projeto.
+# Edit this file to customize your project website.
 #
-# Imagens: coloque na pasta public/images/ e use o caminho
-#   relativo (ex: /images/team/foto.jpg)
+# Images: place them in public/images/ and use relative paths
+#   (e.g. /images/team/photo.jpg)
 #
-# Conteudo: adicione ficheiros .md nas pastas dentro de content/
-#   content/sections/  — seccoes de texto (about, objectives, ...)
-#   content/team/      — membros da equipa (um ficheiro por pessoa)
-#   content/funders/   — financiadores (um ficheiro por entidade)
+# Content: add .md files to the folders inside content/
+#   content/sections/      — text sections (about, objectives, ...)
+#   content/deliverables/  — project deliverables (one file per item)
+#   content/team/          — team members (one file per person)
+#   content/funders/       — funders (one file per entity)
 #
-# Todas as seccoes sao opcionais e aparecem automaticamente.
+# Gallery: place images in public/images/gallery/ and they appear automatically.
+#
+# All sections are optional and appear automatically.
 # ============================================================
 
-# -- Metadata do Projeto --
+# -- Project Metadata --
 project:
   name: "Project Name"
   tagline: "Your project tagline"
   description: "Brief project description for search engines."
   language: "en"
 
-# -- Cores --
+# -- Colors --
 colors:
   primary: "#1a5276"
   secondary: "#2980b9"
@@ -31,11 +34,24 @@ colors:
   text: "#1f2937"
   textLight: "#6b7280"
 
-# -- Navegacao --
+# -- Navigation --
 navigation:
   # logo: "/images/logo.png"
 
-# -- Seccao Hero (banner principal) --
+# -- Section Order (optional) --
+# Use this map to define the order of all sections in one place.
+# The key is the section id (filename without .md extension, or
+# 'deliverables', 'gallery', 'team', 'funding').
+# Lower values appear first.
+sectionOrder:
+  about: 10
+  objectives: 20
+  deliverables: 30
+  gallery: 80
+  team: 90
+  funding: 95
+
+# -- Hero Section (main banner) --
 hero:
   # backgroundImage: "/images/hero-bg.jpg"
   # logo: "/images/project-logo.png"
@@ -45,22 +61,62 @@ hero:
     label: "Learn More"
     href: "#about"
 
-# -- Equipa (opcional) --
-# Os membros sao definidos em content/team/*.md
-# Aqui pode configurar o titulo e posicao da seccao.
+# -- Deliverables (optional) --
+# Deliverables are defined in content/deliverables/*.md
+# Configure the section title and position here.
+deliverables:
+  title: "Deliverables"
+  order: 30
+
+# -- Gallery (optional) --
+# Place images in public/images/gallery/ and the gallery appears automatically.
+gallery:
+  title: "Gallery"
+  order: 80
+
+# -- Team (optional) --
+# Team members are defined in content/team/*.md
+# Configure the section title and position here.
 team:
   title: "Team"
   order: 90
 
-# -- Financiamento (opcional) --
-# Os financiadores sao definidos em content/funders/*.md
-# Aqui pode configurar o titulo, descricao e posicao da seccao.
+# -- Funding (optional) --
+# Funders are defined in content/funders/*.md
+# Configure the section title, description and position here.
 funding:
   title: "Funding"
   description: "This project is funded by:"
   order: 95
 
-# -- Rodape --
+# -- Contact Form (optional) --
+# A floating button opens a contact popup. Remove or comment out
+# this block to disable the contact form entirely.
+# The endpoint should point to a form service (e.g. https://formspree.io/f/YOUR_ID).
+contact:
+  title: "Contact Us"
+  endpoint: "https://formspree.io/f/YOUR_FORM_ID"
+  buttonLabel: "Contact"
+  successMessage: "Thank you! We'll get back to you soon."
+  fields:
+    - name: "name"
+      label: "Name"
+      type: "text"
+      required: true
+    - name: "email"
+      label: "Email"
+      type: "email"
+      required: true
+    - name: "subject"
+      label: "Subject"
+      type: "text"
+      required: false
+    - name: "message"
+      label: "Message"
+      type: "textarea"
+      required: true
+
+# -- Footer --
 footer:
   # institutionLogo: "/images/lasige-logo.png"
   institutionUrl: "https://www.lasige.pt"

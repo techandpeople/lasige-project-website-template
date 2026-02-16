@@ -1,11 +1,11 @@
 ---
 import { getCollection, render } from 'astro:content';
 import site from '../../site.yaml';
-import TeamCard from './TeamCard.astro';
+import DeliverableCard from './DeliverableCard.astro';
 
-const members = await getCollection('team');
-const sorted = [...members].sort((a, b) => a.data.order - b.data.order);
-const title = site.team?.title || 'Team';
+const deliverables = await getCollection('deliverables');
+const sorted = [...deliverables].sort((a, b) => a.data.order - b.data.order);
+const title = site.deliverables?.title || 'Deliverables';
 
 const rendered = await Promise.all(
 	sorted.map(async (entry) => {
@@ -15,17 +15,17 @@ const rendered = await Promise.all(
 );
 ---
 {sorted.length > 0 && (
-	<section id="team" class="py-20">
+	<section id="deliverables" class="py-20 bg-surface">
 		<div class="max-w-6xl mx-auto px-4">
 			<h2 class="text-3xl md:text-4xl font-bold text-primary mb-12 text-center">
 				{title}
 			</h2>
 
-			<div class="flex flex-wrap justify-center gap-4">
+			<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
 				{rendered.map(({ entry, Content }) => (
-					<TeamCard member={entry.data} hasBody={!!entry.body?.trim()}>
+					<DeliverableCard deliverable={entry.data} hasBody={!!entry.body?.trim()}>
 						<Content />
-					</TeamCard>
+					</DeliverableCard>
 				))}
 			</div>
 		</div>

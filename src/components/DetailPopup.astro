@@ -1,0 +1,49 @@
+---
+// Shared popup overlay for team member bios and deliverable abstracts.
+// Cards with [data-popup-trigger] open it; content is read from a hidden
+// sibling [data-popup-content] element inside the card.
+---
+<div id="detail-overlay" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 p-4">
+	<div class="bg-white rounded-xl shadow-2xl w-full max-w-lg relative max-h-[80vh] overflow-y-auto">
+		<button
+			id="detail-close"
+			class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-2xl leading-none"
+			aria-label="Close"
+		>&times;</button>
+		<div id="detail-body" class="p-6"></div>
+	</div>
+</div>
+
+<script>
+	const overlay = document.getElementById('detail-overlay');
+	const body = document.getElementById('detail-body');
+	const closeBtn = document.getElementById('detail-close');
+
+	function open(html: string) {
+		if (!body || !overlay) return;
+		body.innerHTML = html;
+		overlay.classList.remove('hidden');
+		overlay.classList.add('flex');
+	}
+
+	function close() {
+		overlay?.classList.add('hidden');
+		overlay?.classList.remove('flex');
+	}
+
+	closeBtn?.addEventListener('click', close);
+	overlay?.addEventListener('click', (e) => {
+		if (e.target === overlay) close();
+	});
+	document.addEventListener('keydown', (e) => {
+		if (e.key === 'Escape') close();
+	});
+
+	document.querySelectorAll('[data-popup-trigger]').forEach((trigger) => {
+		trigger.addEventListener('click', (e) => {
+			e.preventDefault();
+			const content = trigger.querySelector('[data-popup-content]');
+			if (content) open(content.innerHTML);
+		});
+	});
+</script>

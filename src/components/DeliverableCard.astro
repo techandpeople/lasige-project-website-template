@@ -1,0 +1,79 @@
+---
+interface Props {
+	deliverable: {
+		title: string;
+		description?: string;
+		type?: 'publication' | 'software' | 'dataset' | 'report' | 'other';
+		date?: string;
+		url?: string;
+	};
+	hasBody?: boolean;
+}
+
+const { deliverable, hasBody = false } = Astro.props;
+
+const typeLabels: Record<string, string> = {
+	publication: 'Publication',
+	software: 'Software',
+	dataset: 'Dataset',
+	report: 'Report',
+	other: 'Other',
+};
+
+const typeColors: Record<string, string> = {
+	publication: 'bg-blue-100 text-blue-800',
+	software: 'bg-green-100 text-green-800',
+	dataset: 'bg-purple-100 text-purple-800',
+	report: 'bg-amber-100 text-amber-800',
+	other: 'bg-gray-100 text-gray-800',
+};
+
+const typeName = deliverable.type || 'other';
+const isClickable = hasBody && !deliverable.url;
+---
+<div
+	class:list={["flex flex-col p-5 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow", isClickable && "cursor-pointer"]}
+	{...(isClickable ? { "data-popup-trigger": true } : {})}
+>
+	{deliverable.url && (
+		<a href={deliverable.url} target="_blank" rel="noopener noreferrer" class="text-xs text-accent underline mb-1 self-end">
+			Open &rarr;
+		</a>
+	)}
+	<div class="flex items-center gap-2 mb-2">
+		<span class:list={["text-xs font-medium px-2 py-0.5 rounded-full", typeColors[typeName]]}>
+			{typeLabels[typeName]}
+		</span>
+		{deliverable.date && (
+			<span class="text-muted text-xs">{deliverable.date}</span>
+		)}
+	</div>
+	<h3 class="font-semibold text-body text-sm">{deliverable.title}</h3>
+	{deliverable.description && (
+		<p class="text-muted text-xs mt-1">{deliverable.description}</p>
+	)}
+
+	{hasBody && (
+		<div data-popup-content class="hidden">
+			<div class="mb-4">
+				<div class="flex items-center gap-2 mb-2">
+					<span class:list={["text-xs font-medium px-2 py-0.5 rounded-full", typeColors[typeName]]}>
+						{typeLabels[typeName]}
+					</span>
+					{deliverable.date && (
+						<span class="text-muted text-xs">{deliverable.date}</span>
+					)}
+				</div>
+				<h2 class="text-xl font-bold text-primary">{deliverable.title}</h2>
+				{deliverable.url && (
+					<a href={deliverable.url} target="_blank" rel="noopener noreferrer" class="text-sm text-accent underline">
+						{deliverable.url}
+					</a>
+				)}
+			</div>
+			<div class="prose prose-lg max-w-none">
+				<slot />
+			</div>
+		</div>
+	)}
+</div>

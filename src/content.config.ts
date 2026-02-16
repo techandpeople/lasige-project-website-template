@@ -39,4 +39,16 @@ const funders = defineCollection({
   }),
 });
 
-export const collections = { sections, team, funders };
+const deliverables = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './content/deliverables' }),
+  schema: z.object({
+    title: z.string(),
+    description: z.string().optional(),
+    type: z.enum(['publication', 'software', 'dataset', 'report', 'other']).default('other'),
+    date: z.string().optional(),
+    url: z.string().optional(),
+    order: z.number().default(0),
+  }),
+});
+
+export const collections = { sections, team, funders, deliverables };

@@ -1,0 +1,115 @@
+---
+import fs from 'node:fs';
+import path from 'node:path';
+import site from '../../site.yaml';
+
+const title = site.gallery?.title || 'Gallery';
+
+const galleryDir = path.resolve('public/images/gallery');
+const extensions = new Set(['.jpg', '.jpeg', '.png', '.webp', '.gif', '.avif', '.svg']);
+
+const imageList = fs.existsSync(galleryDir)
+	? fs.readdirSync(galleryDir)
+		.filter((f: string) => extensions.has(path.extname(f).toLowerCase()))
+		.sort()
+		.map((f: string) => ({
+			src: `/images/gallery/${f}`,
+			alt: f.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' '),
+		}))
+	: [];
+---
+{imageList.length > 0 && (
+	<section id="gallery" class="py-20">
+		<div class="max-w-6xl mx-auto px-4">
+			<h2 class="text-3xl md:text-4xl font-bold text-primary mb-12 text-center">
+				{title}
+			</h2>
+
+			<div class="gallery-slideshow relative overflow-hidden rounded-lg shadow-lg">
+				<div class="gallery-track flex transition-transform duration-500 ease-in-out">
+					{imageList.map((img: { src: string; alt: string }, i: number) => (
+						<div class="gallery-slide min-w-full flex items-center justify-center bg-black/5" data-index={i}>
+							<img
+								src={img.src}
+								alt={img.alt}
+								class="max-h-[500px] w-full object-contain"
+							/>
+						</div>
+					))}
+				</div>
+
+				{imageList.length > 1 && (
+					<>
+						<button
+							class="gallery-prev absolute left-3 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-primary rounded-full w-10 h-10 flex items-center justify-center shadow-md transition-colors"
+							aria-label="Previous image"
+						>
+							&#8249;
+						</button>
+						<button
+							class="gallery-next absolute right-3 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-primary rounded-full w-10 h-10 flex items-center justify-center shadow-md transition-colors"
+							aria-label="Next image"
+						>
+							&#8250;
+						</button>
+
+						<div class="gallery-dots flex justify-center gap-2 py-4">
+							{imageList.map((_: { src: string; alt: string }, i: number) => (
+								<button
+									class:list={["w-2.5 h-2.5 rounded-full transition-colors", i === 0 ? "bg-primary" : "bg-gray-300"]}
+									data-dot={i}
+									aria-label={`Go to image ${i + 1}`}
+								/>
+							))}
+						</div>
+					</>
+				)}
+			</div>
+		</div>
+	</section>
+)}
+
+<script>
+	document.querySelectorAll('.gallery-slideshow').forEach((slideshow) => {
+		const track = slideshow.querySelector('.gallery-track') as HTMLElement;
+		const slides = slideshow.querySelectorAll('.gallery-slide');
+		const dots = slideshow.querySelectorAll('[data-dot]');
+		const prevBtn = slideshow.querySelector('.gallery-prev');
+		const nextBtn = slideshow.querySelector('.gallery-next');
+
+		if (!track || slides.length <= 1) return;
+
+		let current = 0;
+		const total = slides.length;
+		let autoplayTimer: ReturnType<typeof setInterval>;
+
+		function goTo(index: number) {
+			current = ((index % total) + total) % total;
+			track.style.transform = `translateX(-${current * 100}%)`;
+			dots.forEach((dot, i) => {
+				dot.classList.toggle('bg-primary', i === current);
+				dot.classList.toggle('bg-gray-300', i !== current);
+			});
+		}
+
+		function startAutoplay() {
+			autoplayTimer = setInterval(() => goTo(current + 1), 5000);
+		}
+
+		function resetAutoplay() {
+			clearInterval(autoplayTimer);
+			startAutoplay();
+		}
+
+		prevBtn?.addEventListener('click', () => { goTo(current - 1); resetAutoplay(); });
+		nextBtn?.addEventListener('click', () => { goTo(current + 1); resetAutoplay(); });
+		dots.forEach((dot) => {
+			dot.addEventListener('click', () => {
+				goTo(Number((dot as HTMLElement).dataset.dot));
+				resetAutoplay();
+			});
+		});
+
+		startAutoplay();
+	});
+</script>

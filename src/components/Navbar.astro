@@ -1,4 +1,5 @@
 ---
+import fs from 'node:fs';
 import { getCollection } from 'astro:content';
 import site from '../../site.yaml';
 
@@ -8,6 +9,12 @@ const { navigation, project } = site;
 const contentSections = await getCollection('sections');
 const teamMembers = await getCollection('team');
 const funderEntries = await getCollection('funders');
+const deliverableEntries = await getCollection('deliverables');
+
+const orderMap: Record<string, number> = site.sectionOrder ?? {};
+function getOrder(id: string, fallback: number): number {
+	return orderMap[id] ?? fallback;
+}
 
 type NavItem = { label: string; href: string; order: number };
 const navItems: NavItem[] = [
@@ -15,22 +22,39 @@ const navItems: NavItem[] = [
 	...contentSections.map((s: { id: string; data: { navLabel?: string; title: string; order: number } }) => ({
 		label: s.data.navLabel || s.data.title,
 		href: `#${s.id}`,
-		order: s.data.order,
+		order: getOrder(s.id, s.data.order),
 	})),
 ];
 
+const galleryDir = new URL('../../public/images/gallery', import.meta.url);
+const hasGallery = fs.existsSync(galleryDir) &&
+	fs.readdirSync(galleryDir).some((f: string) => /\.(jpe?g|png|webp|gif|avif|svg)$/i.test(f));
+if (hasGallery) {
+	navItems.push({
+		label: site.gallery?.navLabel || site.gallery?.title || 'Gallery',
+		href: '#gallery',
+		order: getOrder('gallery', site.gallery?.order ?? 80),
+	});
+}
+if (deliverableEntries.length > 0) {
+	navItems.push({
+		label: site.deliverables?.navLabel || site.deliverables?.title || 'Deliverables',
+		href: '#deliverables',
+		order: getOrder('deliverables', site.deliverables?.order ?? 30),
+	});
+}
 if (teamMembers.length > 0) {
 	navItems.push({
 		label: site.team?.navLabel || site.team?.title || 'Team',
 		href: '#team',
-		order: site.team?.order ?? 90,
+		order: getOrder('team', site.team?.order ?? 90),
 	});
 }
 if (funderEntries.length > 0) {
 	navItems.push({
 		label: site.funding?.navLabel || site.funding?.title || 'Funding',
 		href: '#funding',
-		order: site.funding?.order ?? 95,
+		order: getOrder('funding', site.funding?.order ?? 95),
 	});
 }
 
@@ -50,7 +74,7 @@ navItems.sort((a, b) => a.order - b.order);
 				<li>
 					<a
 						href={item.href}
-						class="nav-link text-body hover:text-primary transition-colors font-medium"
+						class="nav-link text-body hover:text-primary transition-all font-medium px-3 py-1 rounded-md"
 					>
 						{item.label}
 					</a>
@@ -75,7 +99,7 @@ navItems.sort((a, b) => a.order - b.order);
 				<li>
 					<a
 						href={item.href}
-						class="nav-link block py-2 text-body hover:text-primary transition-colors font-medium"
+						class="nav-link block py-2 text-body hover:text-primary transition-all font-medium px-3 rounded-lg"
 					>
 						{item.label}
 					</a>

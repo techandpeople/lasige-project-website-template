@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="600" viewBox="0 0 1200 600">
+  <rect width="1200" height="600" fill="#2d4a22"/>
+  <rect x="50" y="50" width="1100" height="500" rx="20" fill="#3a5c2e" stroke="#6aad4a" stroke-width="2"/>
+  <text x="600" y="260" text-anchor="middle" font-family="Arial, sans-serif" font-size="48" font-weight="bold" fill="#ffffff">Research Workshop</text>
+  <text x="600" y="320" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" fill="#a4d48e">Collaborative session with partners</text>
+  <rect x="200" y="400" width="120" height="80" rx="8" fill="#6aad4a" opacity="0.3"/>
+  <rect x="380" y="390" width="120" height="90" rx="8" fill="#6aad4a" opacity="0.25"/>
+  <rect x="540" y="410" width="120" height="70" rx="8" fill="#6aad4a" opacity="0.2"/>
+  <rect x="700" y="395" width="120" height="85" rx="8" fill="#6aad4a" opacity="0.3"/>
+  <rect x="880" y="405" width="120" height="75" rx="8" fill="#6aad4a" opacity="0.2"/>
+</svg>

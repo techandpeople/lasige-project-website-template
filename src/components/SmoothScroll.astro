@@ -20,21 +20,55 @@
 		});
 	});
 
-	// Intersection Observer for active nav link highlighting
-	const sections = document.querySelectorAll('section[id]');
+	// Active nav link highlighting based on scroll position
+	const sections = Array.from(document.querySelectorAll<HTMLElement>('section[id]'));
 	const navLinks = document.querySelectorAll('.nav-link');
 
-	const observer = new IntersectionObserver((entries) => {
-		entries.forEach(entry => {
-			if (entry.isIntersecting) {
-				navLinks.forEach(link => {
-					const isActive = link.getAttribute('href') === `#${entry.target.id}`;
-					link.classList.toggle('text-primary', isActive);
-					link.classList.toggle('font-bold', isActive);
-				});
-			}
+	function setActive(id: string) {
+		navLinks.forEach(link => {
+			const isActive = link.getAttribute('href') === `#${id}`;
+			link.classList.toggle('active-nav', isActive);
 		});
-	}, { rootMargin: '-20% 0px -80% 0px' });
+	}
 
-	sections.forEach(section => observer.observe(section));
+	function onScroll() {
+		const navbarHeight = document.getElementById('navbar')?.offsetHeight || 64;
+		// Detection line: a point slightly below the navbar
+		const detectionY = navbarHeight + 20;
+
+		// If near the bottom of the page, activate the last visible section
+		if (window.innerHeight + window.scrollY >= document.body.scrollHeight - 10) {
+			const last = sections[sections.length - 1];
+			if (last) setActive(last.id);
+			return;
+		}
+
+		// Find the section that contains the detection point.
+		// We look for the last section whose top is above the detection line.
+		let current = sections[0]?.id || '';
+		for (const section of sections) {
+			const rect = section.getBoundingClientRect();
+			if (rect.top <= detectionY) {
+				current = section.id;
+			}
+		}
+		setActive(current);
+	}
+
+	window.addEventListener('scroll', onScroll, { passive: true });
+	window.addEventListener('resize', onScroll, { passive: true });
+	onScroll();
 </script>
+
+<style is:global>
+	/* Offset anchor scroll for fixed navbar */
+	html {
+		scroll-padding-top: 4.5rem;
+	}
+
+	.nav-link.active-nav {
+		color: var(--color-primary);
+		text-shadow: 0.4px 0 0 currentColor, -0.4px 0 0 currentColor;
+		background-color: color-mix(in srgb, var(--color-primary) 10%, transparent);
+	}
+</style>

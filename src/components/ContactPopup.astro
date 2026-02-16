@@ -1,0 +1,123 @@
+---
+import site from '../../site.yaml';
+
+const contact = site.contact;
+if (!contact?.endpoint) return;
+
+const title = contact.title || 'Contact Us';
+const buttonLabel = contact.buttonLabel || 'Contact';
+const successMessage = contact.successMessage || 'Thank you! We\'ll get back to you soon.';
+
+type Field = { name: string; label: string; type?: astroHTML.JSX.HTMLInputTypeAttribute | 'textarea'; required?: boolean };
+const defaultFields: Field[] = [
+	{ name: 'name', label: 'Name', type: 'text', required: true },
+	{ name: 'email', label: 'Email', type: 'email', required: true },
+	{ name: 'message', label: 'Message', type: 'textarea', required: true },
+];
+const fields: Field[] = contact.fields?.length ? contact.fields : defaultFields;
+---
+<button
+	id="contact-open"
+	class="fixed bottom-6 right-6 z-40 bg-primary text-white px-5 py-3 rounded-full shadow-lg hover:opacity-90 transition-opacity font-medium"
+	aria-label="Open contact form"
+>
+	{buttonLabel}
+</button>
+
+<div id="contact-overlay" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 p-4">
+	<div class="bg-white rounded-xl shadow-2xl w-full max-w-md relative">
+		<button
+			id="contact-close"
+			class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-2xl leading-none"
+			aria-label="Close contact form"
+		>&times;</button>
+
+		<div class="p-6">
+			<h2 class="text-2xl font-bold text-primary mb-4">{title}</h2>
+
+			<form id="contact-form" action={contact.endpoint} method="POST">
+				{fields.map((field: Field) => (
+					<label class="block mb-3">
+						<span class="text-sm font-medium text-body">{field.label}</span>
+						{field.type === 'textarea' ? (
+							<textarea
+								name={field.name}
+								required={field.required ?? false}
+								rows="4"
+								class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none resize-y"
+							></textarea>
+						) : (
+							<input
+								type={field.type || 'text'}
+								name={field.name}
+								required={field.required ?? false}
+								class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none"
+							/>
+						)}
+					</label>
+				))}
+
+				<button
+					type="submit"
+					class="w-full bg-primary text-white py-2.5 rounded-md font-medium hover:opacity-90 transition-opacity"
+				>
+					Send
+				</button>
+			</form>
+
+			<p id="contact-success" class="hidden text-center text-green-600 font-medium py-8">
+				{successMessage}
+			</p>
+		</div>
+	</div>
+</div>
+
+<script>
+	const openBtn = document.getElementById('contact-open');
+	const closeBtn = document.getElementById('contact-close');
+	const overlay = document.getElementById('contact-overlay');
+	const form = document.getElementById('contact-form') as HTMLFormElement | null;
+	const success = document.getElementById('contact-success');
+
+	function open() {
+		overlay?.classList.remove('hidden');
+		overlay?.classList.add('flex');
+	}
+
+	function close() {
+		overlay?.classList.add('hidden');
+		overlay?.classList.remove('flex');
+	}
+
+	openBtn?.addEventListener('click', open);
+	closeBtn?.addEventListener('click', close);
+	overlay?.addEventListener('click', (e) => {
+		if (e.target === overlay) close();
+	});
+	document.addEventListener('keydown', (e) => {
+		if (e.key === 'Escape') close();
+	});
+
+	form?.addEventListener('submit', async (e) => {
+		e.preventDefault();
+		const data = new FormData(form);
+
+		try {
+			await fetch(form.action, {
+				method: 'POST',
+				body: data,
+				headers: { Accept: 'application/json' },
+			});
+			form.classList.add('hidden');
+			success?.classList.remove('hidden');
+			setTimeout(() => {
+				close();
+				form.reset();
+				form.classList.remove('hidden');
+				success?.classList.add('hidden');
+			}, 3000);
+		} catch {
+			alert('Something went wrong. Please try again.');
+		}
+	});
+</script>

@@ -1,4 +1,5 @@
 ---
+import fs from 'node:fs';
 import { getCollection, render } from 'astro:content';
 import site from '../../site.yaml';
 import Layout from '../layouts/Layout.astro';
@@ -6,33 +7,56 @@ import Navbar from '../components/Navbar.astro';
 import Hero from '../components/Hero.astro';
 import Section from '../components/Section.astro';
 import Team from '../components/Team.astro';
+import Deliverables from '../components/Deliverables.astro';
 import Funding from '../components/Funding.astro';
+import Gallery from '../components/Gallery.astro';
 import Footer from '../components/Footer.astro';
+import ContactPopup from '../components/ContactPopup.astro';
+import DetailPopup from '../components/DetailPopup.astro';
 import SmoothScroll from '../components/SmoothScroll.astro';
 
 // Load all content and build page blocks sorted by order
 const contentSections = await getCollection('sections');
 const teamMembers = await getCollection('team');
 const funderEntries = await getCollection('funders');
+const deliverableEntries = await getCollection('deliverables');
+
+const galleryDir = new URL('../../public/images/gallery', import.meta.url);
+const hasGallery = fs.existsSync(galleryDir) &&
+	fs.readdirSync(galleryDir).some((f: string) => /\.(jpe?g|png|webp|gif|avif|svg)$/i.test(f));
+
+// Centralised ordering: sectionOrder in site.yaml overrides individual order values
+const orderMap: Record<string, number> = site.sectionOrder ?? {};
+function getOrder(id: string, fallback: number): number {
+	return orderMap[id] ?? fallback;
+}
 
 type PageBlock =
 	| { type: 'content'; entry: (typeof contentSections)[number]; order: number }
 	| { type: 'team'; order: number }
+	| { type: 'deliverables'; order: number }
+	| { type: 'gallery'; order: number }
 	| { type: 'funding'; order: number };
 
 const blocks: PageBlock[] = [
 	...contentSections.map((entry: (typeof contentSections)[number]) => ({
 		type: 'content' as const,
 		entry,
-		order: entry.data.order,
+		order: getOrder(entry.id, entry.data.order),
 	})),
 ];
 
+if (deliverableEntries.length > 0) {
+	blocks.push({ type: 'deliverables', order: getOrder('deliverables', site.deliverables?.order ?? 30) });
+}
+if (hasGallery) {
+	blocks.push({ type: 'gallery', order: getOrder('gallery', site.gallery?.order ?? 80) });
+}
 if (teamMembers.length > 0) {
-	blocks.push({ type: 'team', order: site.team?.order ?? 90 });
+	blocks.push({ type: 'team', order: getOrder('team', site.team?.order ?? 90) });
 }
 if (funderEntries.length > 0) {
-	blocks.push({ type: 'funding', order: site.funding?.order ?? 95 });
+	blocks.push({ type: 'funding', order: getOrder('funding', site.funding?.order ?? 95) });
 }
 
 blocks.sort((a, b) => a.order - b.order);
@@ -55,10 +79,14 @@ blocks.sort((a, b) => a.order - b.order);
 					</Section>
 				);
 			}
+			if (block.type === 'deliverables') return <Deliverables />;
+			if (block.type === 'gallery') return <Gallery />;
 			if (block.type === 'team') return <Team />;
 			if (block.type === 'funding') return <Funding />;
 		})}
 	</main>
 	<Footer />
+	<ContactPopup />
+	<DetailPopup />
 	<SmoothScroll />
 </Layout>
