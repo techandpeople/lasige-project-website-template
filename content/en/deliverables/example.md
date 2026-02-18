@@ -5,7 +5,6 @@ date: "2025-06"
 description: "Initial project report covering requirements, architecture, and methodology."
 url: "https://example.com/deliverable-d1.1"
 order: 1
-lang: "en"
 ---
 
 This deliverable presents the initial analysis of the project requirements and defines the overall system architecture.

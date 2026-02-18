@@ -4,5 +4,4 @@ name: "Funding Entity"
 url: "https://example.com"
 grant: "Grant Reference"
 order: 1
-lang: "en"
 ---

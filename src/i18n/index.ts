@@ -19,45 +19,53 @@ export function t(lang: string): UIStrings {
 }
 
 /**
- * Given an Astro params.lang value (undefined for default locale),
- * returns the resolved language code.
+ * Given an Astro params.lang value, returns the resolved language code.
  */
 export function getLang(paramsLang: string | undefined): string {
   return paramsLang && supportedLangs.includes(paramsLang) ? paramsLang : defaultLang;
 }
 
 /**
- * Build a path for a given language.
- * Always prefixed: '/en/', '/pt/', etc.
+ * Build a path for a given language. Always prefixed: '/en/', '/pt/', etc.
  */
 export function langPath(lang: string): string {
   return `/${lang}/`;
 }
 
 /**
- * Strip language prefix from a content collection entry ID.
- * "en/about" -> "about", "pt/objectives" -> "objectives"
+ * Extract the language from a content entry ID.
+ * Entry IDs follow the pattern "<lang>/<type>/<filename>" (e.g. "en/sections/about").
+ * The first path segment is the language.
  */
-export function contentId(entryId: string): string {
-  const parts = entryId.split('/');
-  return parts.length > 1 ? parts.slice(1).join('/') : entryId;
+export function langFromId(id: string): string {
+  return id.split('/')[0] ?? defaultLang;
+}
+
+/**
+ * Extract the base content key from an entry ID, stripping the language prefix.
+ * "en/sections/about" → "about"
+ * "pt/team/pi"        → "pi"
+ */
+export function contentId(id: string): string {
+  const parts = id.split('/');
+  return parts[parts.length - 1] ?? id;
 }
 
 /**
  * Filter and resolve content entries for a given language with fallback to default.
  * For each entry in the default language, use the localized version if available.
  */
-export function getLocalizedEntries<T extends { id: string; data: { lang?: string } }>(
+export function getLocalizedEntries<T extends { id: string }>(
   allEntries: T[],
   lang: string,
 ): T[] {
-  const fallbackEntries = allEntries.filter((e) => (e.data.lang ?? defaultLang) === defaultLang);
-  if (lang === defaultLang) return fallbackEntries;
+  const defaultEntries = allEntries.filter((e) => langFromId(e.id) === defaultLang);
+  if (lang === defaultLang) return defaultEntries;
 
-  const localizedEntries = allEntries.filter((e) => e.data.lang === lang);
-  return fallbackEntries.map((fallback) => {
-    const id = contentId(fallback.id);
-    const localized = localizedEntries.find((l) => contentId(l.id) === id);
-    return localized || fallback;
+  const localizedEntries = allEntries.filter((e) => langFromId(e.id) === lang);
+  return defaultEntries.map((fallback) => {
+    const base = contentId(fallback.id);
+    const localized = localizedEntries.find((l) => contentId(l.id) === base);
+    return localized ?? fallback;
   });
 }

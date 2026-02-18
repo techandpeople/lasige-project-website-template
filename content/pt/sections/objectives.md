@@ -3,7 +3,6 @@ title: "Objetivos"
 navLabel: "Objetivos"
 order: 20
 background: "default"
-lang: "pt"
 ---
 
 ### Objetivos de Investigação

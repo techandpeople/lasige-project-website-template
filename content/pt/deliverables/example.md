@@ -5,7 +5,6 @@ date: "2025-06"
 description: "Relatório inicial do projeto cobrindo requisitos, arquitetura e metodologia."
 url: "https://example.com/deliverable-d1.1"
 order: 1
-lang: "pt"
 ---
 
 Este resultado apresenta a análise inicial dos requisitos do projeto e define a arquitetura geral do sistema.

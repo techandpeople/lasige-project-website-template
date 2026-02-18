@@ -3,7 +3,6 @@ title: "Objectives"
 navLabel: "Objectives"
 order: 20
 background: "default"
-lang: "en"
 ---
 
 ### Research Goals

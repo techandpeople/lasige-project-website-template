@@ -3,7 +3,6 @@ title: "Sobre"
 navLabel: "Sobre"
 order: 10
 background: "surface"
-lang: "pt"
 ---
 
 Descreva o seu projeto de investigação aqui. Explique os principais objetivos,

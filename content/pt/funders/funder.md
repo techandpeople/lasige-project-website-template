@@ -4,5 +4,4 @@ name: "Entidade Financiadora"
 url: "https://example.com"
 grant: "Referência da Bolsa"
 order: 1
-lang: "pt"
 ---

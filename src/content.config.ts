@@ -1,26 +1,27 @@
 import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
 
+// Content is organised as content/<lang>/<type>/<file>.md
+// The language is derived from the first path segment — no lang field needed in frontmatter.
+
 const sections = defineCollection({
-  loader: glob({ pattern: '**/*.md', base: './content/sections' }),
+  loader: glob({ pattern: '*/sections/*.md', base: './content' }),
   schema: z.object({
     title: z.string(),
     navLabel: z.string().optional(),
     order: z.number().default(10),
     background: z.enum(['default', 'surface']).default('default'),
-    lang: z.enum(['en', 'pt']).default('en'),
   }),
 });
 
 const team = defineCollection({
-  loader: glob({ pattern: '**/*.md', base: './content/team' }),
+  loader: glob({ pattern: '*/team/*.md', base: './content' }),
   schema: z.object({
     name: z.string(),
     role: z.string(),
     photo: z.string().optional(),
     institution: z.string().optional(),
     order: z.number().default(0),
-    lang: z.enum(['en', 'pt']).default('en'),
     links: z.object({
       email: z.string().optional(),
       website: z.string().optional(),
@@ -31,19 +32,18 @@ const team = defineCollection({
 });
 
 const funders = defineCollection({
-  loader: glob({ pattern: '**/*.md', base: './content/funders' }),
+  loader: glob({ pattern: '*/funders/*.md', base: './content' }),
   schema: z.object({
     name: z.string(),
     logo: z.string().optional(),
     url: z.string().optional(),
     grant: z.string().optional(),
     order: z.number().default(0),
-    lang: z.enum(['en', 'pt']).default('en'),
   }),
 });
 
 const deliverables = defineCollection({
-  loader: glob({ pattern: '**/*.md', base: './content/deliverables' }),
+  loader: glob({ pattern: '*/deliverables/*.md', base: './content' }),
   schema: z.object({
     title: z.string(),
     description: z.string().optional(),
@@ -51,7 +51,6 @@ const deliverables = defineCollection({
     date: z.string().optional(),
     url: z.string().optional(),
     order: z.number().default(0),
-    lang: z.enum(['en', 'pt']).default('en'),
   }),
 });
 
