@@ -4,6 +4,7 @@ role: "Principal Investigator"
 # photo: "/images/team/pi.jpg"
 institution: "LASIGE, FCUL"
 order: 1
+lang: "en"
 links:
   email: "email@example.com"
   website: "https://example.com"

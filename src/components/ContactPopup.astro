@@ -1,7 +1,13 @@
 ---
-import site from '../../site.yaml';
+import { type UIStrings } from '../i18n';
 
-const contact = site.contact;
+interface Props {
+	ui: UIStrings;
+	siteConfig: Record<string, any>;
+}
+
+const { ui, siteConfig } = Astro.props;
+const contact = siteConfig.contact;
 if (!contact?.endpoint) return;
 
 const title = contact.title || 'Contact Us';
@@ -19,17 +25,17 @@ const fields: Field[] = contact.fields?.length ? contact.fields : defaultFields;
 <button
 	id="contact-open"
 	class="fixed bottom-6 right-6 z-40 bg-primary text-white px-5 py-3 rounded-full shadow-lg hover:opacity-90 transition-opacity font-medium"
-	aria-label="Open contact form"
+	aria-label={ui.contact.openForm}
 >
 	{buttonLabel}
 </button>
 
-<div id="contact-overlay" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 p-4">
+<div id="contact-overlay" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 p-4" data-error-msg={ui.contact.error}>
 	<div class="bg-white rounded-xl shadow-2xl w-full max-w-md relative">
 		<button
 			id="contact-close"
 			class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-2xl leading-none"
-			aria-label="Close contact form"
+			aria-label={ui.contact.closeForm}
 		>&times;</button>
 
 		<div class="p-6">
@@ -61,7 +67,7 @@ const fields: Field[] = contact.fields?.length ? contact.fields : defaultFields;
 					type="submit"
 					class="w-full bg-primary text-white py-2.5 rounded-md font-medium hover:opacity-90 transition-opacity"
 				>
-					Send
+					{ui.contact.send}
 				</button>
 			</form>
 
@@ -117,7 +123,8 @@ const fields: Field[] = contact.fields?.length ? contact.fields : defaultFields;
 				success?.classList.add('hidden');
 			}, 3000);
 		} catch {
-			alert('Something went wrong. Please try again.');
+			const errorMsg = overlay?.dataset.errorMsg || 'Something went wrong. Please try again.';
+			alert(errorMsg);
 		}
 	});
 </script>

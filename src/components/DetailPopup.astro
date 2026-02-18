@@ -2,13 +2,20 @@
 // Shared popup overlay for team member bios and deliverable abstracts.
 // Cards with [data-popup-trigger] open it; content is read from a hidden
 // sibling [data-popup-content] element inside the card.
+import { type UIStrings } from '../i18n';
+
+interface Props {
+	ui: UIStrings;
+}
+
+const { ui } = Astro.props;
 ---
 <div id="detail-overlay" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 p-4">
 	<div class="bg-white rounded-xl shadow-2xl w-full max-w-lg relative max-h-[80vh] overflow-y-auto">
 		<button
 			id="detail-close"
 			class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-2xl leading-none"
-			aria-label="Close"
+			aria-label={ui.detail.close}
 		>&times;</button>
 		<div id="detail-body" class="p-6"></div>
 	</div>

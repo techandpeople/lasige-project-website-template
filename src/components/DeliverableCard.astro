@@ -1,4 +1,6 @@
 ---
+import { type UIStrings } from '../i18n';
+
 interface Props {
 	deliverable: {
 		title: string;
@@ -8,17 +10,12 @@ interface Props {
 		url?: string;
 	};
 	hasBody?: boolean;
+	ui: UIStrings;
 }
 
-const { deliverable, hasBody = false } = Astro.props;
+const { deliverable, hasBody = false, ui } = Astro.props;
 
-const typeLabels: Record<string, string> = {
-	publication: 'Publication',
-	software: 'Software',
-	dataset: 'Dataset',
-	report: 'Report',
-	other: 'Other',
-};
+const typeLabels = ui.deliverableTypes;
 
 const typeColors: Record<string, string> = {
 	publication: 'bg-blue-100 text-blue-800',
@@ -37,7 +34,7 @@ const isClickable = hasBody && !deliverable.url;
 >
 	{deliverable.url && (
 		<a href={deliverable.url} target="_blank" rel="noopener noreferrer" class="text-xs text-accent underline mb-1 self-end">
-			Open &rarr;
+			{ui.deliverables.open} &rarr;
 		</a>
 	)}
 	<div class="flex items-center gap-2 mb-2">

@@ -1,11 +1,18 @@
 ---
 import { getCollection, render } from 'astro:content';
-import site from '../../site.yaml';
+import { getLocalizedEntries } from '../i18n';
 import TeamCard from './TeamCard.astro';
 
-const members = await getCollection('team');
+interface Props {
+	lang: string;
+	siteConfig: Record<string, any>;
+}
+
+const { lang, siteConfig } = Astro.props;
+const allMembers = await getCollection('team');
+const members = getLocalizedEntries(allMembers, lang);
 const sorted = [...members].sort((a, b) => a.data.order - b.data.order);
-const title = site.team?.title || 'Team';
+const title = siteConfig.team?.title || 'Team';
 
 const rendered = await Promise.all(
 	sorted.map(async (entry) => {

@@ -1,6 +1,12 @@
 ---
 import site from '../../site.yaml';
-const footer = site.footer || {};
+
+interface Props {
+	siteConfig: Record<string, any>;
+}
+
+const { siteConfig } = Astro.props;
+const footer = siteConfig.footer || {};
 const { project } = site;
 ---
 <footer class="bg-primary text-white py-12">

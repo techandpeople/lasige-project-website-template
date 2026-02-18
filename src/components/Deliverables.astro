@@ -1,11 +1,19 @@
 ---
 import { getCollection, render } from 'astro:content';
-import site from '../../site.yaml';
+import { type UIStrings, getLocalizedEntries } from '../i18n';
 import DeliverableCard from './DeliverableCard.astro';
 
-const deliverables = await getCollection('deliverables');
+interface Props {
+	lang: string;
+	ui: UIStrings;
+	siteConfig: Record<string, any>;
+}
+
+const { lang, ui, siteConfig } = Astro.props;
+const allDeliverables = await getCollection('deliverables');
+const deliverables = getLocalizedEntries(allDeliverables, lang);
 const sorted = [...deliverables].sort((a, b) => a.data.order - b.data.order);
-const title = site.deliverables?.title || 'Deliverables';
+const title = siteConfig.deliverables?.title || 'Deliverables';
 
 const rendered = await Promise.all(
 	sorted.map(async (entry) => {
@@ -23,7 +31,7 @@ const rendered = await Promise.all(
 
 			<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
 				{rendered.map(({ entry, Content }) => (
-					<DeliverableCard deliverable={entry.data} hasBody={!!entry.body?.trim()}>
+					<DeliverableCard deliverable={entry.data} hasBody={!!entry.body?.trim()} ui={ui}>
 						<Content />
 					</DeliverableCard>
 				))}

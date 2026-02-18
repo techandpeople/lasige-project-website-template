@@ -8,6 +8,7 @@ const sections = defineCollection({
     navLabel: z.string().optional(),
     order: z.number().default(10),
     background: z.enum(['default', 'surface']).default('default'),
+    lang: z.enum(['en', 'pt']).default('en'),
   }),
 });
 
@@ -19,6 +20,7 @@ const team = defineCollection({
     photo: z.string().optional(),
     institution: z.string().optional(),
     order: z.number().default(0),
+    lang: z.enum(['en', 'pt']).default('en'),
     links: z.object({
       email: z.string().optional(),
       website: z.string().optional(),
@@ -36,6 +38,7 @@ const funders = defineCollection({
     url: z.string().optional(),
     grant: z.string().optional(),
     order: z.number().default(0),
+    lang: z.enum(['en', 'pt']).default('en'),
   }),
 });
 
@@ -48,6 +51,7 @@ const deliverables = defineCollection({
     date: z.string().optional(),
     url: z.string().optional(),
     order: z.number().default(0),
+    lang: z.enum(['en', 'pt']).default('en'),
   }),
 });
 

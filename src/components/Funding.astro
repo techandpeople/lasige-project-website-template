@@ -1,12 +1,19 @@
 ---
 import { getCollection } from 'astro:content';
-import site from '../../site.yaml';
+import { getLocalizedEntries } from '../i18n';
 import FunderCard from './FunderCard.astro';
 
-const funders = await getCollection('funders');
+interface Props {
+	lang: string;
+	siteConfig: Record<string, any>;
+}
+
+const { lang, siteConfig } = Astro.props;
+const allFunders = await getCollection('funders');
+const funders = getLocalizedEntries(allFunders, lang);
 const sorted = [...funders].sort((a, b) => a.data.order - b.data.order);
-const title = site.funding?.title || 'Funding';
-const description = site.funding?.description;
+const title = siteConfig.funding?.title || 'Funding';
+const description = siteConfig.funding?.description;
 ---
 {sorted.length > 0 && (
 	<section id="funding" class="py-20 bg-surface">

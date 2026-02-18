@@ -1,0 +1,42 @@
+---
+import { supportedLangs, langPath } from '../i18n';
+
+interface Props {
+	currentLang: string;
+}
+
+const { currentLang } = Astro.props;
+
+const langLabels: Record<string, string> = {
+	en: 'EN',
+	pt: 'PT',
+};
+---
+<div class="lang-switcher flex items-center gap-1 text-sm">
+	{supportedLangs.map((lang) => (
+		<a
+			href={langPath(lang)}
+			data-lang-path={langPath(lang)}
+			class:list={[
+				"px-2 py-1 rounded transition-colors",
+				lang === currentLang
+					? "bg-primary text-white font-semibold"
+					: "text-body hover:text-primary"
+			]}
+		>
+			{langLabels[lang] || lang.toUpperCase()}
+		</a>
+	))}
+</div>
+
+<script>
+	// On click, append the currently visible section's hash to the language link
+	document.querySelectorAll('.lang-switcher a[data-lang-path]').forEach((link) => {
+		link.addEventListener('click', () => {
+			const active = document.querySelector('.nav-link.active-nav');
+			const hash = active?.getAttribute('href') || '';
+			const base = (link as HTMLAnchorElement).dataset.langPath!;
+			(link as HTMLAnchorElement).href = base + hash;
+		});
+	});
+</script>

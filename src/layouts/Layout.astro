@@ -2,10 +2,15 @@
 import site from '../../site.yaml';
 import '../styles/global.css';
 
+interface Props {
+	lang?: string;
+}
+
+const { lang = 'en' } = Astro.props;
 const { project, colors } = site;
 ---
 <!doctype html>
-<html lang={project.language || 'en'}>
+<html lang={lang}>
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />

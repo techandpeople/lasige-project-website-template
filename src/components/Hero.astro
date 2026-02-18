@@ -1,6 +1,10 @@
 ---
-import site from '../../site.yaml';
-const { hero } = site;
+interface Props {
+	siteConfig: Record<string, any>;
+}
+
+const { siteConfig } = Astro.props;
+const { hero } = siteConfig;
 ---
 <section id="hero" class="relative min-h-screen flex items-center justify-center text-center px-4 pt-16">
 	{hero.backgroundImage && (

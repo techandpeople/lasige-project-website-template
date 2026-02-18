@@ -1,0 +1,109 @@
+---
+import fs from 'node:fs';
+import { getCollection, render } from 'astro:content';
+import { getLang, t, contentId, getLocalizedEntries } from '../../i18n';
+import { getSiteConfig } from '../../i18n/site';
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/Navbar.astro';
+import Hero from '../../components/Hero.astro';
+import Section from '../../components/Section.astro';
+import Team from '../../components/Team.astro';
+import Deliverables from '../../components/Deliverables.astro';
+import Funding from '../../components/Funding.astro';
+import Gallery from '../../components/Gallery.astro';
+import Footer from '../../components/Footer.astro';
+import ContactPopup from '../../components/ContactPopup.astro';
+import DetailPopup from '../../components/DetailPopup.astro';
+import SmoothScroll from '../../components/SmoothScroll.astro';
+
+export function getStaticPaths() {
+	return [
+		{ params: { lang: 'en' } },
+		{ params: { lang: 'pt' } },
+	];
+}
+
+const lang = getLang(Astro.params.lang);
+const ui = t(lang);
+const siteConfig = getSiteConfig(lang);
+
+// Load all content and filter by language (with fallback)
+const allSections = await getCollection('sections');
+const allTeam = await getCollection('team');
+const allFunders = await getCollection('funders');
+const allDeliverables = await getCollection('deliverables');
+
+const contentSections = getLocalizedEntries(allSections, lang);
+const teamMembers = getLocalizedEntries(allTeam, lang);
+const funderEntries = getLocalizedEntries(allFunders, lang);
+const deliverableEntries = getLocalizedEntries(allDeliverables, lang);
+
+const galleryDir = new URL('../../../public/images/gallery', import.meta.url);
+const hasGallery = fs.existsSync(galleryDir) &&
+	fs.readdirSync(galleryDir).some((f: string) => /\.(jpe?g|png|webp|gif|avif|svg)$/i.test(f));
+
+// Centralised ordering: sectionOrder in site.yaml overrides individual order values
+const orderMap: Record<string, number> = siteConfig.sectionOrder ?? {};
+function getOrder(id: string, fallback: number): number {
+	return orderMap[id] ?? fallback;
+}
+
+type PageBlock =
+	| { type: 'content'; entry: (typeof contentSections)[number]; order: number }
+	| { type: 'team'; order: number }
+	| { type: 'deliverables'; order: number }
+	| { type: 'gallery'; order: number }
+	| { type: 'funding'; order: number };
+
+const blocks: PageBlock[] = [
+	...contentSections.map((entry: (typeof contentSections)[number]) => ({
+		type: 'content' as const,
+		entry,
+		order: getOrder(contentId(entry.id), entry.data.order),
+	})),
+];
+
+if (deliverableEntries.length > 0) {
+	blocks.push({ type: 'deliverables', order: getOrder('deliverables', siteConfig.deliverables?.order ?? 30) });
+}
+if (hasGallery) {
+	blocks.push({ type: 'gallery', order: getOrder('gallery', siteConfig.gallery?.order ?? 80) });
+}
+if (teamMembers.length > 0) {
+	blocks.push({ type: 'team', order: getOrder('team', siteConfig.team?.order ?? 90) });
+}
+if (funderEntries.length > 0) {
+	blocks.push({ type: 'funding', order: getOrder('funding', siteConfig.funding?.order ?? 95) });
+}
+
+blocks.sort((a, b) => a.order - b.order);
+---
+
+<Layout lang={lang}>
+	<Navbar lang={lang} ui={ui} />
+	<main>
+		<Hero siteConfig={siteConfig} />
+		{blocks.map(async (block) => {
+			if (block.type === 'content') {
+				const { Content } = await render(block.entry);
+				return (
+					<Section
+						id={contentId(block.entry.id)}
+						title={block.entry.data.title}
+						background={block.entry.data.background}
+					>
+						<Content />
+					</Section>
+				);
+			}
+			if (block.type === 'deliverables') return <Deliverables lang={lang} ui={ui} siteConfig={siteConfig} />;
+			if (block.type === 'gallery') return <Gallery ui={ui} siteConfig={siteConfig} />;
+			if (block.type === 'team') return <Team lang={lang} siteConfig={siteConfig} />;
+			if (block.type === 'funding') return <Funding lang={lang} siteConfig={siteConfig} />;
+		})}
+	</main>
+	<Footer siteConfig={siteConfig} />
+	<ContactPopup ui={ui} siteConfig={siteConfig} />
+	<DetailPopup ui={ui} />
+	<SmoothScroll />
+</Layout>

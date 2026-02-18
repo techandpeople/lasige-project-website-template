@@ -1,9 +1,15 @@
 ---
 import fs from 'node:fs';
 import path from 'node:path';
-import site from '../../site.yaml';
+import { type UIStrings } from '../i18n';
 
-const title = site.gallery?.title || 'Gallery';
+interface Props {
+	ui: UIStrings;
+	siteConfig: Record<string, any>;
+}
+
+const { ui, siteConfig } = Astro.props;
+const title = siteConfig.gallery?.title || 'Gallery';
 
 const galleryDir = path.resolve('public/images/gallery');
 const extensions = new Set(['.jpg', '.jpeg', '.png', '.webp', '.gif', '.avif', '.svg']);
@@ -42,13 +48,13 @@ const imageList = fs.existsSync(galleryDir)
 					<>
 						<button
 							class="gallery-prev absolute left-3 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-primary rounded-full w-10 h-10 flex items-center justify-center shadow-md transition-colors"
-							aria-label="Previous image"
+							aria-label={ui.gallery.previousImage}
 						>
 							&#8249;
 						</button>
 						<button
 							class="gallery-next absolute right-3 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-primary rounded-full w-10 h-10 flex items-center justify-center shadow-md transition-colors"
-							aria-label="Next image"
+							aria-label={ui.gallery.nextImage}
 						>
 							&#8250;
 						</button>
@@ -58,7 +64,7 @@ const imageList = fs.existsSync(galleryDir)
 								<button
 									class:list={["w-2.5 h-2.5 rounded-full transition-colors", i === 0 ? "bg-primary" : "bg-gray-300"]}
 									data-dot={i}
-									aria-label={`Go to image ${i + 1}`}
+									aria-label={`${ui.gallery.goToImage} ${i + 1}`}
 								/>
 							))}
 						</div>

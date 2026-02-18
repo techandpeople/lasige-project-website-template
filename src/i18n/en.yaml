@@ -1,0 +1,27 @@
+nav:
+  home: "Home"
+  toggleMenu: "Toggle menu"
+
+deliverableTypes:
+  publication: "Publication"
+  software: "Software"
+  dataset: "Dataset"
+  report: "Report"
+  other: "Other"
+
+deliverables:
+  open: "Open"
+
+contact:
+  send: "Send"
+  error: "Something went wrong. Please try again."
+  openForm: "Open contact form"
+  closeForm: "Close contact form"
+
+gallery:
+  previousImage: "Previous image"
+  nextImage: "Next image"
+  goToImage: "Go to image"
+
+detail:
+  close: "Close"

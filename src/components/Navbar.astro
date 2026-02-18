@@ -2,14 +2,29 @@
 import fs from 'node:fs';
 import { getCollection } from 'astro:content';
 import site from '../../site.yaml';
+import { type UIStrings, contentId, getLocalizedEntries } from '../i18n';
+import { getSiteConfig } from '../i18n/site';
+import LanguageSwitcher from './LanguageSwitcher.astro';
 
+interface Props {
+	lang: string;
+	ui: UIStrings;
+}
+
+const { lang, ui } = Astro.props;
+const siteConfig = getSiteConfig(lang);
 const { navigation, project } = site;
 
 // Build nav items automatically from all content collections
-const contentSections = await getCollection('sections');
-const teamMembers = await getCollection('team');
-const funderEntries = await getCollection('funders');
-const deliverableEntries = await getCollection('deliverables');
+const allSections = await getCollection('sections');
+const allTeam = await getCollection('team');
+const allFunders = await getCollection('funders');
+const allDeliverables = await getCollection('deliverables');
+
+const contentSections = getLocalizedEntries(allSections, lang);
+const teamMembers = getLocalizedEntries(allTeam, lang);
+const funderEntries = getLocalizedEntries(allFunders, lang);
+const deliverableEntries = getLocalizedEntries(allDeliverables, lang);
 
 const orderMap: Record<string, number> = site.sectionOrder ?? {};
 function getOrder(id: string, fallback: number): number {
@@ -18,11 +33,11 @@ function getOrder(id: string, fallback: number): number {
 
 type NavItem = { label: string; href: string; order: number };
 const navItems: NavItem[] = [
-	{ label: 'Home', href: '#hero', order: 0 },
+	{ label: ui.nav.home, href: '#hero', order: 0 },
 	...contentSections.map((s: { id: string; data: { navLabel?: string; title: string; order: number } }) => ({
 		label: s.data.navLabel || s.data.title,
-		href: `#${s.id}`,
-		order: getOrder(s.id, s.data.order),
+		href: `#${contentId(s.id)}`,
+		order: getOrder(contentId(s.id), s.data.order),
 	})),
 ];
 
@@ -31,30 +46,30 @@ const hasGallery = fs.existsSync(galleryDir) &&
 	fs.readdirSync(galleryDir).some((f: string) => /\.(jpe?g|png|webp|gif|avif|svg)$/i.test(f));
 if (hasGallery) {
 	navItems.push({
-		label: site.gallery?.navLabel || site.gallery?.title || 'Gallery',
+		label: siteConfig.gallery?.navLabel || siteConfig.gallery?.title || 'Gallery',
 		href: '#gallery',
-		order: getOrder('gallery', site.gallery?.order ?? 80),
+		order: getOrder('gallery', siteConfig.gallery?.order ?? 80),
 	});
 }
 if (deliverableEntries.length > 0) {
 	navItems.push({
-		label: site.deliverables?.navLabel || site.deliverables?.title || 'Deliverables',
+		label: siteConfig.deliverables?.navLabel || siteConfig.deliverables?.title || 'Deliverables',
 		href: '#deliverables',
-		order: getOrder('deliverables', site.deliverables?.order ?? 30),
+		order: getOrder('deliverables', siteConfig.deliverables?.order ?? 30),
 	});
 }
 if (teamMembers.length > 0) {
 	navItems.push({
-		label: site.team?.navLabel || site.team?.title || 'Team',
+		label: siteConfig.team?.navLabel || siteConfig.team?.title || 'Team',
 		href: '#team',
-		order: getOrder('team', site.team?.order ?? 90),
+		order: getOrder('team', siteConfig.team?.order ?? 90),
 	});
 }
 if (funderEntries.length > 0) {
 	navItems.push({
-		label: site.funding?.navLabel || site.funding?.title || 'Funding',
+		label: siteConfig.funding?.navLabel || siteConfig.funding?.title || 'Funding',
 		href: '#funding',
-		order: getOrder('funding', site.funding?.order ?? 95),
+		order: getOrder('funding', siteConfig.funding?.order ?? 95),
 	});
 }
 
@@ -69,28 +84,34 @@ navItems.sort((a, b) => a.order - b.order);
 			<span class="font-bold text-primary text-lg">{project.name}</span>
 		</a>
 
-		<ul class="hidden md:flex gap-6">
-			{navItems.map((item) => (
-				<li>
-					<a
-						href={item.href}
-						class="nav-link text-body hover:text-primary transition-all font-medium px-3 py-1 rounded-md"
-					>
-						{item.label}
-					</a>
-				</li>
-			))}
-		</ul>
+		<div class="hidden md:flex items-center gap-6">
+			<ul class="flex gap-6">
+				{navItems.map((item) => (
+					<li>
+						<a
+							href={item.href}
+							class="nav-link text-body hover:text-primary transition-all font-medium px-3 py-1 rounded-md"
+						>
+							{item.label}
+						</a>
+					</li>
+				))}
+			</ul>
+			<LanguageSwitcher currentLang={lang} />
+		</div>
 
-		<button
-			id="menu-toggle"
-			class="hamburger p-2 text-body hover:text-primary"
-			aria-label="Toggle menu"
-		>
-			<span></span>
-			<span></span>
-			<span></span>
-		</button>
+		<div class="flex items-center gap-2 md:hidden">
+			<LanguageSwitcher currentLang={lang} />
+			<button
+				id="menu-toggle"
+				class="hamburger p-2 text-body hover:text-primary"
+				aria-label={ui.nav.toggleMenu}
+			>
+				<span></span>
+				<span></span>
+				<span></span>
+			</button>
+		</div>
 	</div>
 
 	<div id="mobile-menu" class="mobile-menu bg-white">

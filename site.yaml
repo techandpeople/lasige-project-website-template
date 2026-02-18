@@ -7,10 +7,10 @@
 #   (e.g. /images/team/photo.jpg)
 #
 # Content: add .md files to the folders inside content/
-#   content/sections/      — text sections (about, objectives, ...)
-#   content/deliverables/  — project deliverables (one file per item)
-#   content/team/          — team members (one file per person)
-#   content/funders/       — funders (one file per entity)
+#   content/sections/<lang>/      — text sections (about, objectives, ...)
+#   content/deliverables/<lang>/  — project deliverables (one file per item)
+#   content/team/<lang>/          — team members (one file per person)
+#   content/funders/<lang>/       — funders (one file per entity)
 #
 # Gallery: place images in public/images/gallery/ and they appear automatically.
 #
@@ -22,7 +22,10 @@ project:
   name: "Project Name"
   tagline: "Your project tagline"
   description: "Brief project description for search engines."
-  language: "en"
+  defaultLanguage: "en"
+  languages:
+    - "en"
+    - "pt"
 
 # -- Colors --
 colors:
@@ -62,7 +65,7 @@ hero:
     href: "#about"
 
 # -- Deliverables (optional) --
-# Deliverables are defined in content/deliverables/*.md
+# Deliverables are defined in content/deliverables/<lang>/*.md
 # Configure the section title and position here.
 deliverables:
   title: "Deliverables"
@@ -75,14 +78,14 @@ gallery:
   order: 80
 
 # -- Team (optional) --
-# Team members are defined in content/team/*.md
+# Team members are defined in content/team/<lang>/*.md
 # Configure the section title and position here.
 team:
   title: "Team"
   order: 90
 
 # -- Funding (optional) --
-# Funders are defined in content/funders/*.md
+# Funders are defined in content/funders/<lang>/*.md
 # Configure the section title, description and position here.
 funding:
   title: "Funding"
@@ -125,3 +128,49 @@ footer:
   socialLinks:
     github: "https://github.com/your-org"
     # twitter: "https://twitter.com/handle"
+
+# ============================================================
+# Multilingual Overrides
+# ============================================================
+# Add per-language overrides for any section above.
+# If a key is not overridden, the top-level value is used.
+i18n:
+  pt:
+    hero:
+      title: "Nome Completo do Projeto"
+      subtitle: "Uma breve descrição da missão do projeto"
+      cta:
+        label: "Saber Mais"
+        href: "#about"
+    deliverables:
+      title: "Resultados"
+    gallery:
+      title: "Galeria"
+    team:
+      title: "Equipa"
+    funding:
+      title: "Financiamento"
+      description: "Este projeto é financiado por:"
+    contact:
+      title: "Contacte-nos"
+      buttonLabel: "Contacto"
+      successMessage: "Obrigado! Entraremos em contacto em breve."
+      fields:
+        - name: "name"
+          label: "Nome"
+          type: "text"
+          required: true
+        - name: "email"
+          label: "Email"
+          type: "email"
+          required: true
+        - name: "subject"
+          label: "Assunto"
+          type: "text"
+          required: false
+        - name: "message"
+          label: "Mensagem"
+          type: "textarea"
+          required: true
+    footer:
+      copyright: "LASIGE, Faculdade de Ciências, Universidade de Lisboa"

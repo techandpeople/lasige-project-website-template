@@ -1,0 +1,27 @@
+nav:
+  home: "Início"
+  toggleMenu: "Alternar menu"
+
+deliverableTypes:
+  publication: "Publicação"
+  software: "Software"
+  dataset: "Conjunto de Dados"
+  report: "Relatório"
+  other: "Outro"
+
+deliverables:
+  open: "Abrir"
+
+contact:
+  send: "Enviar"
+  error: "Algo correu mal. Por favor tente novamente."
+  openForm: "Abrir formulário de contacto"
+  closeForm: "Fechar formulário de contacto"
+
+gallery:
+  previousImage: "Imagem anterior"
+  nextImage: "Próxima imagem"
+  goToImage: "Ir para imagem"
+
+detail:
+  close: "Fechar"
