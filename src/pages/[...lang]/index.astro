@@ -11,6 +11,7 @@ import Team from '../../components/Team.astro';
 import Deliverables from '../../components/Deliverables.astro';
 import Funding from '../../components/Funding.astro';
 import Gallery from '../../components/Gallery.astro';
+import RecruitmentSection from '../../components/RecruitmentSection.astro';
 import Footer from '../../components/Footer.astro';
 import ContactPopup from '../../components/ContactPopup.astro';
 import DetailPopup from '../../components/DetailPopup.astro';
@@ -42,10 +43,12 @@ const galleryDir = new URL('../../../public/images/gallery', import.meta.url);
 const hasGallery = fs.existsSync(galleryDir) &&
 	fs.readdirSync(galleryDir).some((f: string) => /\.(jpe?g|png|webp|gif|avif|svg)$/i.test(f));
 
-// Centralised ordering: sectionOrder in site.yaml overrides individual order values
-const orderMap: Record<string, number> = siteConfig.sectionOrder ?? {};
+// Centralised ordering: sectionOrder array in site-config.yaml defines the order.
+// Items in the array are sorted by position; unlisted items appear after them.
+const sectionOrder: string[] = siteConfig.sectionOrder ?? [];
 function getOrder(id: string, fallback: number): number {
-	return orderMap[id] ?? fallback;
+	const idx = sectionOrder.indexOf(id);
+	return idx >= 0 ? idx : sectionOrder.length + fallback;
 }
 
 type PageBlock =
@@ -53,7 +56,8 @@ type PageBlock =
 	| { type: 'team'; order: number }
 	| { type: 'deliverables'; order: number }
 	| { type: 'gallery'; order: number }
-	| { type: 'funding'; order: number };
+	| { type: 'funding'; order: number }
+	| { type: 'recruitment'; order: number };
 
 const blocks: PageBlock[] = [
 	...contentSections.map((entry: (typeof contentSections)[number]) => ({
@@ -74,6 +78,9 @@ if (teamMembers.length > 0) {
 }
 if (funderEntries.length > 0) {
 	blocks.push({ type: 'funding', order: getOrder('funding', siteConfig.funding?.order ?? 95) });
+}
+if (siteConfig.recruitment) {
+	blocks.push({ type: 'recruitment', order: getOrder('recruitment', siteConfig.recruitment?.order ?? 85) });
 }
 
 blocks.sort((a, b) => a.order - b.order);
@@ -100,6 +107,7 @@ blocks.sort((a, b) => a.order - b.order);
 			if (block.type === 'gallery') return <Gallery ui={ui} siteConfig={siteConfig} />;
 			if (block.type === 'team') return <Team lang={lang} siteConfig={siteConfig} />;
 			if (block.type === 'funding') return <Funding lang={lang} siteConfig={siteConfig} />;
+			if (block.type === 'recruitment') return <RecruitmentSection ui={ui} siteConfig={siteConfig} />;
 		})}
 	</main>
 	<Footer siteConfig={siteConfig} />

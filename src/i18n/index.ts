@@ -1,6 +1,6 @@
 import en from './en.yaml';
 import pt from './pt.yaml';
-import site from '../../site.yaml';
+import site from '../../site-config.yaml';
 
 export type UIStrings = typeof en;
 

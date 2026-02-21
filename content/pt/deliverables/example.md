@@ -4,6 +4,7 @@ type: "report"
 date: "2025-06"
 description: "Relatório inicial do projeto cobrindo requisitos, arquitetura e metodologia."
 url: "https://example.com/deliverable-d1.1"
+image: "/images/gallery/01-project-kickoff.svg"
 order: 1
 ---
 

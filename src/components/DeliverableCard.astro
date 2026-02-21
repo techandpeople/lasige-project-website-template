@@ -8,6 +8,7 @@ interface Props {
 		type?: 'publication' | 'software' | 'dataset' | 'report' | 'other';
 		date?: string;
 		url?: string;
+		image?: string;
 	};
 	hasBody?: boolean;
 	ui: UIStrings;
@@ -27,50 +28,111 @@ const typeColors: Record<string, string> = {
 
 const typeName = deliverable.type || 'other';
 const isClickable = hasBody && !deliverable.url;
----
-<div
-	class:list={["flex flex-col p-5 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow", isClickable && "cursor-pointer"]}
-	{...(isClickable ? { "data-popup-trigger": true } : {})}
->
-	{deliverable.url && (
-		<a href={deliverable.url} target="_blank" rel="noopener noreferrer" class="text-xs text-accent underline mb-1 self-end">
-			{ui.deliverables.open} &rarr;
-		</a>
-	)}
-	<div class="flex items-center gap-2 mb-2">
-		<span class:list={["text-xs font-medium px-2 py-0.5 rounded-full", typeColors[typeName]]}>
-			{typeLabels[typeName]}
-		</span>
-		{deliverable.date && (
-			<span class="text-muted text-xs">{deliverable.date}</span>
-		)}
-	</div>
-	<h3 class="font-semibold text-body text-sm">{deliverable.title}</h3>
-	{deliverable.description && (
-		<p class="text-muted text-xs mt-1">{deliverable.description}</p>
-	)}
+const hasImage = !!deliverable.image;
 
-	{hasBody && (
-		<div data-popup-content class="hidden">
-			<div class="mb-4">
-				<div class="flex items-center gap-2 mb-2">
-					<span class:list={["text-xs font-medium px-2 py-0.5 rounded-full", typeColors[typeName]]}>
-						{typeLabels[typeName]}
-					</span>
-					{deliverable.date && (
-						<span class="text-muted text-xs">{deliverable.date}</span>
-					)}
-				</div>
-				<h2 class="text-xl font-bold text-primary">{deliverable.title}</h2>
-				{deliverable.url && (
-					<a href={deliverable.url} target="_blank" rel="noopener noreferrer" class="text-sm text-accent underline">
-						{deliverable.url}
-					</a>
+// With image: card is always a link if URL exists; otherwise popup-trigger if body exists
+const Tag = hasImage && deliverable.url ? 'a' : 'div';
+---
+
+{hasImage ? (
+	<Tag
+		class:list={[
+			"relative h-56 rounded-lg overflow-hidden group",
+			deliverable.url ? "cursor-pointer" : (isClickable ? "cursor-pointer" : ""),
+		]}
+		{...(Tag === 'a' ? { href: deliverable.url, target: "_blank", rel: "noopener noreferrer" } : {})}
+		{...(!deliverable.url && isClickable ? { "data-popup-trigger": true } : {})}
+	>
+		<img
+			src={deliverable.image}
+			alt={deliverable.title}
+			class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+		/>
+
+		<!-- Default overlay: gradient + badge + title -->
+		<div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent transition-all duration-300 group-hover:from-black/85 group-hover:via-black/50">
+			<div class="absolute bottom-0 left-0 right-0 p-4">
+				<span class:list={["text-xs font-medium px-2 py-0.5 rounded-full mb-2 inline-block", typeColors[typeName]]}>
+					{typeLabels[typeName]}
+				</span>
+				<h3 class="text-white font-semibold text-sm leading-tight">{deliverable.title}</h3>
+				{deliverable.description && (
+					<p class="text-white/0 group-hover:text-white/90 text-xs mt-1 line-clamp-2 transition-all duration-300 leading-relaxed">
+						{deliverable.description}
+					</p>
 				)}
 			</div>
-			<div class="prose prose-lg max-w-none">
-				<slot />
-			</div>
 		</div>
-	)}
-</div>
+
+		{hasBody && (
+			<div data-popup-content class="hidden">
+				<div class="mb-4">
+					<div class="flex items-center gap-2 mb-2">
+						<span class:list={["text-xs font-medium px-2 py-0.5 rounded-full", typeColors[typeName]]}>
+							{typeLabels[typeName]}
+						</span>
+						{deliverable.date && (
+							<span class="text-muted text-xs">{deliverable.date}</span>
+						)}
+					</div>
+					<h2 class="text-xl font-bold text-primary">{deliverable.title}</h2>
+					{deliverable.url && (
+						<a href={deliverable.url} target="_blank" rel="noopener noreferrer" class="text-sm text-accent underline">
+							{deliverable.url}
+						</a>
+					)}
+				</div>
+				<div class="prose prose-lg max-w-none">
+					<slot />
+				</div>
+			</div>
+		)}
+	</Tag>
+) : (
+	<div
+		class:list={["flex flex-col p-5 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow", isClickable && "cursor-pointer"]}
+		{...(isClickable ? { "data-popup-trigger": true } : {})}
+	>
+		{deliverable.url && (
+			<a href={deliverable.url} target="_blank" rel="noopener noreferrer" class="text-xs text-accent underline mb-1 self-end">
+				{ui.deliverables.open}
+			</a>
+		)}
+		<div class="flex items-center gap-2 mb-2">
+			<span class:list={["text-xs font-medium px-2 py-0.5 rounded-full", typeColors[typeName]]}>
+				{typeLabels[typeName]}
+			</span>
+			{deliverable.date && (
+				<span class="text-muted text-xs">{deliverable.date}</span>
+			)}
+		</div>
+		<h3 class="font-semibold text-body text-sm">{deliverable.title}</h3>
+		{deliverable.description && (
+			<p class="text-muted text-xs mt-1">{deliverable.description}</p>
+		)}
+
+		{hasBody && (
+			<div data-popup-content class="hidden">
+				<div class="mb-4">
+					<div class="flex items-center gap-2 mb-2">
+						<span class:list={["text-xs font-medium px-2 py-0.5 rounded-full", typeColors[typeName]]}>
+							{typeLabels[typeName]}
+						</span>
+						{deliverable.date && (
+							<span class="text-muted text-xs">{deliverable.date}</span>
+						)}
+					</div>
+					<h2 class="text-xl font-bold text-primary">{deliverable.title}</h2>
+					{deliverable.url && (
+						<a href={deliverable.url} target="_blank" rel="noopener noreferrer" class="text-sm text-accent underline">
+							{deliverable.url}
+						</a>
+					)}
+				</div>
+				<div class="prose prose-lg max-w-none">
+					<slot />
+				</div>
+			</div>
+		)}
+	</div>
+)}

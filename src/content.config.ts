@@ -50,6 +50,7 @@ const deliverables = defineCollection({
     type: z.enum(['publication', 'software', 'dataset', 'report', 'other']).default('other'),
     date: z.string().optional(),
     url: z.string().optional(),
+    image: z.string().optional(),
     order: z.number().default(0),
   }),
 });

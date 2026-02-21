@@ -1,0 +1,106 @@
+---
+import { type UIStrings } from '../i18n';
+
+interface Props {
+	imageList: { src: string; alt: string }[];
+	title: string;
+	ui: UIStrings;
+}
+
+const { imageList, title, ui } = Astro.props;
+---
+<section id="gallery" class="py-20">
+	<div class="max-w-6xl mx-auto px-4">
+		<h2 class="text-3xl md:text-4xl font-bold text-primary mb-4 text-center">{title}</h2>
+		<div class="w-16 h-1 bg-accent mx-auto mb-12 rounded-full"></div>
+
+		<div class="carousel-container relative overflow-hidden">
+			<!-- Slides -->
+			<div class="carousel-slides relative" style={`height: min(600px, 60vw)`}>
+				{imageList.map((img, i) => (
+					<div
+						class:list={["carousel-slide absolute inset-0 transition-opacity duration-700 ease-in-out", i === 0 ? "opacity-100 z-10" : "opacity-0 z-0"]}
+						data-index={i}
+					>
+						<img
+							src={img.src}
+							alt={img.alt}
+							class="w-full h-full object-cover"
+						/>
+						<div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent px-6 py-4">
+							<span class="text-white text-sm font-medium">{img.alt}</span>
+						</div>
+					</div>
+				))}
+			</div>
+
+			{imageList.length > 1 && (
+				<>
+					<button
+						id="carousel-prev"
+						class="absolute left-4 top-1/2 -translate-y-1/2 z-20 bg-black/40 hover:bg-black/70 text-white rounded-full w-12 h-12 flex items-center justify-center text-2xl transition-colors"
+						aria-label={ui.gallery.previousImage}
+					>&#8249;</button>
+
+					<button
+						id="carousel-next"
+						class="absolute right-4 top-1/2 -translate-y-1/2 z-20 bg-black/40 hover:bg-black/70 text-white rounded-full w-12 h-12 flex items-center justify-center text-2xl transition-colors"
+						aria-label={ui.gallery.nextImage}
+					>&#8250;</button>
+
+					<div id="carousel-dots" class="flex justify-center gap-2 mt-4">
+						{imageList.map((_, i) => (
+							<button
+								class:list={["w-2.5 h-2.5 rounded-full transition-colors duration-300", i === 0 ? "bg-primary" : "bg-gray-300"]}
+								data-dot={i}
+								aria-label={`${ui.gallery.goToImage} ${i + 1}`}
+							/>
+						))}
+					</div>
+				</>
+			)}
+		</div>
+	</div>
+</section>
+
+<script>
+	const slides = document.querySelectorAll<HTMLElement>('.carousel-slide');
+	const dots = document.querySelectorAll<HTMLElement>('[data-dot]');
+	const total = slides.length;
+
+	if (total <= 1) {
+		document.getElementById('carousel-prev')?.remove();
+		document.getElementById('carousel-next')?.remove();
+	}
+
+	let current = 0;
+	let autoplayTimer: ReturnType<typeof setInterval>;
+
+	function goTo(index: number) {
+		slides[current]?.classList.remove('opacity-100', 'z-10');
+		slides[current]?.classList.add('opacity-0', 'z-0');
+		dots[current]?.classList.replace('bg-primary', 'bg-gray-300');
+
+		current = ((index % total) + total) % total;
+
+		slides[current]?.classList.remove('opacity-0', 'z-0');
+		slides[current]?.classList.add('opacity-100', 'z-10');
+		dots[current]?.classList.replace('bg-gray-300', 'bg-primary');
+	}
+
+	function resetAutoplay() {
+		clearInterval(autoplayTimer);
+		autoplayTimer = setInterval(() => goTo(current + 1), 5000);
+	}
+
+	document.getElementById('carousel-prev')?.addEventListener('click', () => { goTo(current - 1); resetAutoplay(); });
+	document.getElementById('carousel-next')?.addEventListener('click', () => { goTo(current + 1); resetAutoplay(); });
+	dots.forEach((dot) => {
+		dot.addEventListener('click', () => {
+			goTo(Number(dot.dataset.dot));
+			resetAutoplay();
+		});
+	});
+
+	if (total > 1) resetAutoplay();
+</script>

@@ -25,3 +25,8 @@ gallery:
 
 detail:
   close: "Fechar"
+
+recruitment:
+  send: "Submeter"
+  error: "Algo correu mal. Por favor tente novamente."
+  schedule: "Agendar uma sessão"

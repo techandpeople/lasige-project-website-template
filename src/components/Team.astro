@@ -24,11 +24,12 @@ const rendered = await Promise.all(
 {sorted.length > 0 && (
 	<section id="team" class="py-20">
 		<div class="max-w-6xl mx-auto px-4">
-			<h2 class="text-3xl md:text-4xl font-bold text-primary mb-12 text-center">
+			<h2 class="text-3xl md:text-4xl font-bold text-primary mb-4 text-center">
 				{title}
 			</h2>
+			<div class="w-16 h-1 bg-accent mx-auto mb-12 rounded-full"></div>
 
-			<div class="flex flex-wrap justify-center gap-4">
+			<div class="flex flex-wrap justify-center gap-6">
 				{rendered.map(({ entry, Content }) => (
 					<TeamCard member={entry.data} hasBody={!!entry.body?.trim()}>
 						<Content />

@@ -42,17 +42,18 @@ navigation:
   # logo: "/images/logo.png"
 
 # -- Section Order (optional) --
-# Use this map to define the order of all sections in one place.
-# The key is the section id (filename without .md extension, or
-# 'deliverables', 'gallery', 'team', 'funding').
-# Lower values appear first.
+# List sections in the order they should appear on the page.
+# IDs: filename without .md (e.g. "about"), or fixed keys: deliverables, gallery,
+#       recruitment, team, funding.
+# Sections not listed here appear after the listed ones, in their default order.
 sectionOrder:
-  about: 10
-  objectives: 20
-  deliverables: 30
-  gallery: 80
-  team: 90
-  funding: 95
+  - about
+  - objectives
+  - deliverables
+  - gallery
+  - recruitment
+  - team
+  - funding
 
 # -- Hero Section (main banner) --
 hero:
@@ -63,6 +64,9 @@ hero:
   cta:
     label: "Learn More"
     href: "#about"
+  secondaryCta:
+    label: "Join Our Study"
+    href: "#recruitment"
 
 # -- Deliverables (optional) --
 # Deliverables are defined in content/deliverables/<lang>/*.md
@@ -73,9 +77,15 @@ deliverables:
 
 # -- Gallery (optional) --
 # Place images in public/images/gallery/ and the gallery appears automatically.
+# style: "grid" (default) shows a masonry-style grid with lightbox on click.
+#        "carousel" shows a full-width carousel with autoplay and fade transition.
+# To remove a style permanently, delete the corresponding component file:
+#   Grid:     src/components/GalleryGrid.astro
+#   Carousel: src/components/GalleryCarousel.astro
 gallery:
   title: "Gallery"
   order: 80
+  style: "grid"   # "grid" or "carousel"
 
 # -- Team (optional) --
 # Team members are defined in content/team/<lang>/*.md
@@ -119,6 +129,38 @@ contact:
       type: "textarea"
       required: true
 
+# -- Recruitment Section (optional) --
+# A section with an inline form for participant recruitment.
+# Remove or comment out this block to disable the section entirely.
+# Add a link in hero.secondaryCta to drive visitors here.
+recruitment:
+  title: "Participate in Our Study"
+  navLabel: "Participate"
+  description: "We are looking for volunteers to participate in our research study. Participation is voluntary and takes approximately 30 minutes. Your data will be kept confidential and used solely for research purposes.\n\nEligibility criteria:\n- Adults aged 18 or over\n- Fluent in English or Portuguese\n- No prior experience required"
+  order: 85
+  endpoint: "https://formspree.io/f/YOUR_FORM_ID"
+  # calendarUrl: "https://calendly.com/your-handle/30min"
+  # calendarUrl: "https://cal.com/your-handle/30min"
+  # calendarUrl: "https://calendar.google.com/calendar/appointments/schedules/YOUR_SCHEDULE_ID"
+  successMessage: "Thank you for your interest! We will be in touch within 5 business days."
+  fields:
+    - name: "name"
+      label: "Full Name"
+      type: "text"
+      required: true
+    - name: "email"
+      label: "Email"
+      type: "email"
+      required: true
+    - name: "age"
+      label: "Age"
+      type: "number"
+      required: true
+    - name: "availability"
+      label: "Preferred availability (days / times)"
+      type: "textarea"
+      required: false
+
 # -- Footer --
 footer:
   # institutionLogo: "/images/lasige-logo.png"
@@ -142,6 +184,9 @@ i18n:
       cta:
         label: "Saber Mais"
         href: "#about"
+      secondaryCta:
+        label: "Participar no Estudo"
+        href: "#recruitment"
     deliverables:
       title: "Resultados"
     gallery:
@@ -174,3 +219,25 @@ i18n:
           required: true
     footer:
       copyright: "LASIGE, Faculdade de Ciências, Universidade de Lisboa"
+    recruitment:
+      title: "Participe no Nosso Estudo"
+      navLabel: "Participe"
+      description: "Procuramos voluntários para participar no nosso estudo de investigação. A participação é voluntária e demora aproximadamente 30 minutos. Os seus dados serão mantidos confidenciais e utilizados exclusivamente para fins de investigação.\n\nCritérios de elegibilidade:\n- Adultos com 18 ou mais anos\n- Fluência em inglês ou português\n- Sem experiência prévia necessária"
+      successMessage: "Obrigado pelo seu interesse! Entraremos em contacto nos próximos 5 dias úteis."
+      fields:
+        - name: "name"
+          label: "Nome Completo"
+          type: "text"
+          required: true
+        - name: "email"
+          label: "Email"
+          type: "email"
+          required: true
+        - name: "age"
+          label: "Idade"
+          type: "number"
+          required: true
+        - name: "availability"
+          label: "Disponibilidade preferida (dias / horários)"
+          type: "textarea"
+          required: false

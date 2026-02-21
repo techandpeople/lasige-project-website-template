@@ -1,0 +1,126 @@
+---
+import { type UIStrings } from '../i18n';
+
+interface Props {
+	imageList: { src: string; alt: string }[];
+	title: string;
+	ui: UIStrings;
+}
+
+const { imageList, title, ui } = Astro.props;
+---
+<section id="gallery" class="py-20">
+	<div class="max-w-6xl mx-auto px-4">
+		<h2 class="text-3xl md:text-4xl font-bold text-primary mb-4 text-center">{title}</h2>
+		<div class="w-16 h-1 bg-accent mx-auto mb-12 rounded-full"></div>
+
+		<div class="grid grid-cols-2 md:grid-cols-3 gap-2">
+			{imageList.map((img, i) => (
+				<button
+					class="gallery-grid-item relative aspect-[4/3] overflow-hidden group cursor-pointer focus:outline-none"
+					data-index={i}
+					aria-label={`${ui.gallery.goToImage} ${i + 1}`}
+				>
+					<img
+						src={img.src}
+						alt={img.alt}
+						class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+					/>
+					<div class="absolute inset-0 bg-black/0 group-hover:bg-black/50 transition-colors duration-300 flex items-end">
+						<span class="text-white text-sm font-medium px-3 py-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 truncate w-full">
+							{img.alt}
+						</span>
+					</div>
+				</button>
+			))}
+		</div>
+	</div>
+</section>
+
+<!-- Lightbox -->
+<div
+	id="gallery-lightbox"
+	class="fixed inset-0 z-50 hidden items-center justify-center bg-black/90"
+	role="dialog"
+	aria-modal="true"
+>
+	<button
+		id="lightbox-close"
+		class="absolute top-4 right-5 text-white/70 hover:text-white text-4xl leading-none z-10"
+		aria-label={ui.detail.close}
+	>&times;</button>
+
+	<button
+		id="lightbox-prev"
+		class="absolute left-4 top-1/2 -translate-y-1/2 text-white/70 hover:text-white text-5xl leading-none z-10 px-2"
+		aria-label={ui.gallery.previousImage}
+	>&#8249;</button>
+
+	<button
+		id="lightbox-next"
+		class="absolute right-4 top-1/2 -translate-y-1/2 text-white/70 hover:text-white text-5xl leading-none z-10 px-2"
+		aria-label={ui.gallery.nextImage}
+	>&#8250;</button>
+
+	<img
+		id="lightbox-img"
+		src=""
+		alt=""
+		class="max-h-[90vh] max-w-[90vw] object-contain select-none"
+	/>
+
+	<div id="lightbox-counter" class="absolute bottom-5 left-1/2 -translate-x-1/2 text-white/60 text-sm tabular-nums"></div>
+</div>
+
+<script>
+	const items = document.querySelectorAll<HTMLButtonElement>('.gallery-grid-item');
+	const lightbox = document.getElementById('gallery-lightbox');
+	const lightboxImg = document.getElementById('lightbox-img') as HTMLImageElement;
+	const counter = document.getElementById('lightbox-counter');
+
+	const images = Array.from(items).map(el => ({
+		src: el.querySelector('img')!.src,
+		alt: el.querySelector('img')!.alt,
+	}));
+
+	let current = 0;
+
+	function openLightbox(index: number) {
+		current = index;
+		showImage();
+		lightbox?.classList.remove('hidden');
+		lightbox?.classList.add('flex');
+		document.body.style.overflow = 'hidden';
+	}
+
+	function closeLightbox() {
+		lightbox?.classList.add('hidden');
+		lightbox?.classList.remove('flex');
+		document.body.style.overflow = '';
+	}
+
+	function showImage() {
+		const img = images[current];
+		if (!img || !lightboxImg) return;
+		lightboxImg.src = img.src;
+		lightboxImg.alt = img.alt;
+		if (counter) counter.textContent = `${current + 1} / ${images.length}`;
+	}
+
+	function prev() { current = (current - 1 + images.length) % images.length; showImage(); }
+	function next() { current = (current + 1) % images.length; showImage(); }
+
+	items.forEach((item, i) => item.addEventListener('click', () => openLightbox(i)));
+	document.getElementById('lightbox-close')?.addEventListener('click', closeLightbox);
+	document.getElementById('lightbox-prev')?.addEventListener('click', prev);
+	document.getElementById('lightbox-next')?.addEventListener('click', next);
+
+	lightbox?.addEventListener('click', (e) => { if (e.target === lightbox) closeLightbox(); });
+
+	document.addEventListener('keydown', (e) => {
+		if (!lightbox?.classList.contains('flex')) return;
+		if (e.key === 'Escape') closeLightbox();
+		if (e.key === 'ArrowLeft') prev();
+		if (e.key === 'ArrowRight') next();
+	});
+</script>

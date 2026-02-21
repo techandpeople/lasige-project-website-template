@@ -1,7 +1,7 @@
 ---
 import fs from 'node:fs';
 import { getCollection } from 'astro:content';
-import site from '../../site.yaml';
+import site from '../../site-config.yaml';
 import { type UIStrings, contentId, getLocalizedEntries } from '../i18n';
 import { getSiteConfig } from '../i18n/site';
 import LanguageSwitcher from './LanguageSwitcher.astro';
@@ -26,9 +26,10 @@ const teamMembers = getLocalizedEntries(allTeam, lang);
 const funderEntries = getLocalizedEntries(allFunders, lang);
 const deliverableEntries = getLocalizedEntries(allDeliverables, lang);
 
-const orderMap: Record<string, number> = site.sectionOrder ?? {};
+const sectionOrder: string[] = site.sectionOrder ?? [];
 function getOrder(id: string, fallback: number): number {
-	return orderMap[id] ?? fallback;
+	const idx = sectionOrder.indexOf(id);
+	return idx >= 0 ? idx : sectionOrder.length + fallback;
 }
 
 type NavItem = { label: string; href: string; order: number };
@@ -70,6 +71,13 @@ if (funderEntries.length > 0) {
 		label: siteConfig.funding?.navLabel || siteConfig.funding?.title || 'Funding',
 		href: '#funding',
 		order: getOrder('funding', siteConfig.funding?.order ?? 95),
+	});
+}
+if (siteConfig.recruitment) {
+	navItems.push({
+		label: siteConfig.recruitment?.navLabel || siteConfig.recruitment?.title || 'Participate',
+		href: '#recruitment',
+		order: getOrder('recruitment', siteConfig.recruitment?.order ?? 85),
 	});
 }
 

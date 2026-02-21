@@ -1,4 +1,4 @@
-import site from '../../site.yaml';
+import site from '../../site-config.yaml';
 
 /**
  * Returns the site config with language-specific overrides applied.
@@ -18,5 +18,8 @@ export function getSiteConfig(lang: string): Record<string, any> {
       ? { ...site.contact, ...langOverrides.contact }
       : site.contact,
     footer: { ...site.footer, ...langOverrides.footer },
+    recruitment: langOverrides.recruitment
+      ? { ...site.recruitment, ...langOverrides.recruitment }
+      : site.recruitment,
   };
 }

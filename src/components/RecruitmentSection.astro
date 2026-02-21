@@ -1,0 +1,155 @@
+---
+import { type UIStrings } from '../i18n';
+
+interface Props {
+	ui: UIStrings;
+	siteConfig: Record<string, any>;
+}
+
+const { ui, siteConfig } = Astro.props;
+const recruitment = siteConfig.recruitment;
+
+if (!recruitment) return;
+
+const title = recruitment.title || 'Participate in Our Study';
+const description = recruitment.description || '';
+const endpoint = recruitment.endpoint || '';
+const calendarUrl = recruitment.calendarUrl || '';
+const successMessage = recruitment.successMessage || 'Thank you! We\'ll be in touch.';
+
+type Field = { name: string; label: string; type?: string; required?: boolean };
+const defaultFields: Field[] = [
+	{ name: 'name', label: 'Name', type: 'text', required: true },
+	{ name: 'email', label: 'Email', type: 'email', required: true },
+];
+const fields: Field[] = recruitment.fields?.length ? recruitment.fields : defaultFields;
+---
+<section id="recruitment" class="py-20 bg-surface">
+	<div class="max-w-6xl mx-auto px-4">
+		<h2 class="text-3xl md:text-4xl font-bold text-primary mb-4 text-center">{title}</h2>
+		<div class="w-16 h-1 bg-accent mx-auto mb-12 rounded-full"></div>
+
+		<div class="grid lg:grid-cols-2 gap-12 items-start">
+			<!-- Left: description + optional direct-book button -->
+			<div class="flex flex-col gap-6">
+				{description && (
+					<p class="text-body text-lg leading-relaxed whitespace-pre-line">{description}</p>
+				)}
+				{calendarUrl && (
+					<a
+						href={calendarUrl}
+						target="_blank"
+						rel="noopener noreferrer"
+						class="inline-flex items-center gap-2 self-start px-5 py-2.5 border-2 border-primary text-primary rounded-lg font-medium hover:bg-primary hover:text-white transition-colors"
+					>
+						<svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+								d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+						</svg>
+						{ui.recruitment.schedule}
+					</a>
+				)}
+			</div>
+
+			<!-- Right: form -->
+			<div
+				class="bg-white rounded-xl shadow-md p-8"
+				data-error-msg={ui.recruitment.error}
+			>
+				{endpoint ? (
+					<>
+						<form id="recruitment-form" action={endpoint} method="POST">
+							{fields.map((field: Field) => (
+								<label class="block mb-4">
+									<span class="text-sm font-medium text-body">{field.label}</span>
+									{field.type === 'textarea' ? (
+										<textarea
+											name={field.name}
+											required={field.required ?? false}
+											rows="4"
+											class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none resize-y"
+										></textarea>
+									) : (
+										<input
+											type={(field.type || 'text') as astroHTML.JSX.HTMLInputTypeAttribute}
+											name={field.name}
+											required={field.required ?? false}
+											class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none"
+										/>
+									)}
+								</label>
+							))}
+							<button
+								type="submit"
+								class="w-full bg-accent text-white py-2.5 rounded-md font-medium hover:opacity-90 transition-opacity"
+							>
+								{ui.recruitment.send}
+							</button>
+						</form>
+
+						<div id="recruitment-success" class="hidden text-center py-6">
+							<p class="text-green-600 font-medium mb-5">{successMessage}</p>
+							{calendarUrl && (
+								<a
+									href={calendarUrl}
+									target="_blank"
+									rel="noopener noreferrer"
+									class="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-lg font-semibold hover:opacity-90 transition-opacity"
+								>
+									<svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+											d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+									</svg>
+									{ui.recruitment.schedule}
+								</a>
+							)}
+						</div>
+					</>
+				) : calendarUrl ? (
+					<div class="text-center py-6">
+						<a
+							href={calendarUrl}
+							target="_blank"
+							rel="noopener noreferrer"
+							class="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-lg font-semibold hover:opacity-90 transition-opacity"
+						>
+							<svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+									d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+							</svg>
+							{ui.recruitment.schedule}
+						</a>
+					</div>
+				) : (
+					<p class="text-muted text-sm text-center py-4">
+						Set <code>recruitment.endpoint</code> or <code>recruitment.calendarUrl</code> in site-config.yaml.
+					</p>
+				)}
+			</div>
+		</div>
+	</div>
+</section>
+
+<script>
+	const form = document.getElementById('recruitment-form') as HTMLFormElement | null;
+	const success = document.getElementById('recruitment-success');
+	const wrapper = form?.closest('[data-error-msg]') as HTMLElement | null;
+
+	form?.addEventListener('submit', async (e) => {
+		e.preventDefault();
+		const data = new FormData(form);
+
+		try {
+			await fetch(form.action, {
+				method: 'POST',
+				body: data,
+				headers: { Accept: 'application/json' },
+			});
+			form.classList.add('hidden');
+			success?.classList.remove('hidden');
+		} catch {
+			const errorMsg = wrapper?.dataset.errorMsg || 'Something went wrong. Please try again.';
+			alert(errorMsg);
+		}
+	});
+</script>

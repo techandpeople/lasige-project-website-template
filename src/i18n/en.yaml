@@ -25,3 +25,8 @@ gallery:
 
 detail:
   close: "Close"
+
+recruitment:
+  send: "Submit"
+  error: "Something went wrong. Please try again."
+  schedule: "Schedule a session"

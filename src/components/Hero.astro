@@ -5,9 +5,14 @@ interface Props {
 
 const { siteConfig } = Astro.props;
 const { hero } = siteConfig;
+const hasBackground = !!hero.backgroundImage;
 ---
-<section id="hero" class="relative min-h-screen flex items-center justify-center text-center px-4 pt-16">
-	{hero.backgroundImage && (
+<section
+	id="hero"
+	class="relative min-h-screen flex items-center justify-center text-center px-4 pt-16"
+	style={!hasBackground ? 'background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%)' : ''}
+>
+	{hasBackground && (
 		<div class="absolute inset-0 z-0">
 			<img src={hero.backgroundImage} alt="" class="w-full h-full object-cover" />
 			<div class="absolute inset-0 bg-primary/70"></div>
@@ -23,27 +28,48 @@ const { hero } = siteConfig;
 			/>
 		)}
 
-		<h1 class:list={[
-			"text-4xl md:text-6xl font-bold mb-4",
-			hero.backgroundImage ? "text-white" : "text-primary"
-		]}>
+		<h1 class="text-4xl md:text-6xl font-bold mb-4 text-white">
 			{hero.title}
 		</h1>
 
-		<p class:list={[
-			"text-xl md:text-2xl mb-8",
-			hero.backgroundImage ? "text-white/90" : "text-muted"
-		]}>
+		<p class="text-xl md:text-2xl mb-10 text-white/85">
 			{hero.subtitle}
 		</p>
 
-		{hero.cta && (
-			<a
-				href={hero.cta.href}
-				class="inline-block px-8 py-3 bg-accent text-white rounded-lg font-semibold hover:opacity-90 transition-opacity text-lg"
-			>
-				{hero.cta.label}
-			</a>
-		)}
+		<div class="flex flex-wrap gap-4 justify-center">
+			{hero.cta && (
+				<a
+					href={hero.cta.href}
+					class="inline-block px-8 py-3 bg-accent text-white rounded-lg font-semibold hover:opacity-90 transition-opacity text-lg"
+				>
+					{hero.cta.label}
+				</a>
+			)}
+			{hero.secondaryCta && (
+				<a
+					href={hero.secondaryCta.href}
+					class="inline-block px-8 py-3 border-2 border-white text-white rounded-lg font-semibold hover:bg-white/20 transition-colors text-lg"
+				>
+					{hero.secondaryCta.label}
+				</a>
+			)}
+		</div>
+	</div>
+
+	<!-- Scroll indicator -->
+	<div class="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 hero-scroll-indicator">
+		<svg class="w-6 h-6 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+		</svg>
 	</div>
 </section>
+
+<style>
+	.hero-scroll-indicator {
+		animation: hero-bounce 2s infinite;
+	}
+	@keyframes hero-bounce {
+		0%, 100% { transform: translateX(-50%) translateY(0); }
+		50% { transform: translateX(-50%) translateY(8px); }
+	}
+</style>
