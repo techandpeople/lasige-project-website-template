@@ -2,6 +2,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { type UIStrings } from '../i18n';
+import { withBase } from '../utils/url';
 import GalleryGrid from './GalleryGrid.astro';
 import GalleryCarousel from './GalleryCarousel.astro';
 
@@ -22,7 +23,7 @@ const imageList = fs.existsSync(galleryDir)
 		.filter((f: string) => extensions.has(path.extname(f).toLowerCase()))
 		.sort()
 		.map((f: string) => ({
-			src: `/images/gallery/${f}`,
+			src: withBase(`/images/gallery/${f}`),
 			alt: f.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' '),
 		}))
 	: [];

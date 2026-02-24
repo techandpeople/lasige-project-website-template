@@ -1,6 +1,7 @@
 ---
 import site from '../../site-config.yaml';
 import '../styles/global.css';
+import { withBase } from '../utils/url';
 
 interface Props {
 	lang?: string;
@@ -14,8 +15,8 @@ const { project, colors } = site;
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
+		<link rel="icon" type="image/svg+xml" href={withBase('/favicon.svg')} />
+		<link rel="icon" href={withBase('/favicon.ico')} />
 		<meta name="generator" content={Astro.generator} />
 		<meta name="description" content={project.description} />
 		<title>{project.name}</title>

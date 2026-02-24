@@ -8,6 +8,8 @@ interface Props {
 	};
 }
 
+import { withBase } from '../utils/url';
+
 const { funder } = Astro.props;
 const Tag = funder.url ? 'a' : 'div';
 ---
@@ -16,7 +18,7 @@ const Tag = funder.url ? 'a' : 'div';
 	class="flex flex-col items-center p-6 bg-white rounded-lg shadow-sm hover:shadow-md hover:scale-105 transition-all duration-300 text-center"
 >
 	{funder.logo ? (
-		<img src={funder.logo} alt={funder.name} class="h-16 mb-4 object-contain" />
+		<img src={withBase(funder.logo)} alt={funder.name} class="h-16 mb-4 object-contain" />
 	) : (
 		<div class="h-16 mb-4 flex items-center justify-center">
 			<span class="text-primary font-bold text-lg">{funder.name}</span>

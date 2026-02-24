@@ -1,4 +1,6 @@
 ---
+import { withBase } from '../utils/url';
+
 interface Props {
 	siteConfig: Record<string, any>;
 }
@@ -14,7 +16,7 @@ const hasBackground = !!hero.backgroundImage;
 >
 	{hasBackground && (
 		<div class="absolute inset-0 z-0">
-			<img src={hero.backgroundImage} alt="" class="w-full h-full object-cover" />
+			<img src={withBase(hero.backgroundImage)} alt="" class="w-full h-full object-cover" />
 			<div class="absolute inset-0 bg-primary/70"></div>
 		</div>
 	)}
@@ -22,7 +24,7 @@ const hasBackground = !!hero.backgroundImage;
 	<div class="relative z-10 max-w-3xl">
 		{hero.logo && (
 			<img
-				src={hero.logo}
+				src={withBase(hero.logo)}
 				alt={hero.title}
 				class="mx-auto mb-8 max-h-32"
 			/>

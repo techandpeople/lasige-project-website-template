@@ -1,6 +1,7 @@
 ---
 import fs from 'node:fs';
 import { getCollection } from 'astro:content';
+import { withBase } from '../utils/url';
 import site from '../../site-config.yaml';
 import { type UIStrings, contentId, getLocalizedEntries } from '../i18n';
 import { getSiteConfig } from '../i18n/site';
@@ -87,7 +88,7 @@ navItems.sort((a, b) => a.order - b.order);
 	<div class="max-w-6xl mx-auto px-4 flex items-center justify-between h-16">
 		<a href="#hero" class="flex items-center gap-2">
 			{navigation?.logo && (
-				<img src={navigation.logo} alt={project.name} class="h-8" />
+				<img src={withBase(navigation.logo)} alt={project.name} class="h-8" />
 			)}
 			<span class="font-bold text-primary text-lg">{project.name}</span>
 		</a>
