@@ -1,6 +1,6 @@
 ---
-import fs from 'node:fs';
 import { getCollection } from 'astro:content';
+import { hasGalleryImages } from '../utils/gallery';
 import { withBase } from '../utils/url';
 import site from '../../site-config.yaml';
 import { type UIStrings, contentId, getLocalizedEntries } from '../i18n';
@@ -43,9 +43,7 @@ const navItems: NavItem[] = [
 	})),
 ];
 
-const galleryDir = new URL('../../public/images/gallery', import.meta.url);
-const hasGallery = fs.existsSync(galleryDir) &&
-	fs.readdirSync(galleryDir).some((f: string) => /\.(jpe?g|png|webp|gif|avif|svg)$/i.test(f));
+const hasGallery = hasGalleryImages();
 if (hasGallery) {
 	navItems.push({
 		label: siteConfig.gallery?.navLabel || siteConfig.gallery?.title || 'Gallery',

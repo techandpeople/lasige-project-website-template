@@ -1,8 +1,6 @@
 ---
-import fs from 'node:fs';
-import path from 'node:path';
 import { type UIStrings } from '../i18n';
-import { withBase } from '../utils/url';
+import { getGalleryImages } from '../utils/gallery';
 import GalleryGrid from './GalleryGrid.astro';
 import GalleryCarousel from './GalleryCarousel.astro';
 
@@ -15,19 +13,7 @@ const { ui, siteConfig } = Astro.props;
 const title = siteConfig.gallery?.title || 'Gallery';
 const style = siteConfig.gallery?.style || 'grid';
 
-// Use import.meta.url for a reliable absolute path regardless of working directory
-const galleryUrl = new URL('../../public/images/gallery', import.meta.url);
-const extensions = new Set(['.jpg', '.jpeg', '.png', '.webp', '.gif', '.avif', '.svg']);
-
-const imageList = fs.existsSync(galleryUrl)
-	? fs.readdirSync(galleryUrl)
-		.filter((f: string) => extensions.has(path.extname(f).toLowerCase()))
-		.sort()
-		.map((f: string) => ({
-			src: withBase(`/images/gallery/${f}`),
-			alt: f.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' '),
-		}))
-	: [];
+const imageList = getGalleryImages(import.meta.env.BASE_URL);
 ---
 {imageList.length > 0 && (
 	style === 'carousel'

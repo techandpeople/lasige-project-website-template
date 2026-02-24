@@ -1,6 +1,6 @@
 ---
-import fs from 'node:fs';
 import { getCollection, render } from 'astro:content';
+import { hasGalleryImages } from '../../utils/gallery';
 import { getLang, t, contentId, getLocalizedEntries } from '../../i18n';
 import { getSiteConfig } from '../../i18n/site';
 import Layout from '../../layouts/Layout.astro';
@@ -39,9 +39,7 @@ const teamMembers = getLocalizedEntries(allTeam, lang);
 const funderEntries = getLocalizedEntries(allFunders, lang);
 const deliverableEntries = getLocalizedEntries(allDeliverables, lang);
 
-const galleryDir = new URL('../../../public/images/gallery', import.meta.url);
-const hasGallery = fs.existsSync(galleryDir) &&
-	fs.readdirSync(galleryDir).some((f: string) => /\.(jpe?g|png|webp|gif|avif|svg)$/i.test(f));
+const hasGallery = hasGalleryImages();
 
 // Centralised ordering: sectionOrder array in site-config.yaml defines the order.
 // Items in the array are sorted by position; unlisted items appear after them.
