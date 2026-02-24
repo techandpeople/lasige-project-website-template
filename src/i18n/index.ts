@@ -26,10 +26,12 @@ export function getLang(paramsLang: string | undefined): string {
 }
 
 /**
- * Build a path for a given language. Always prefixed: '/en/', '/pt/', etc.
+ * Build a path for a given language, including the Astro base URL.
+ * e.g. '/en/' in dev, '/repo-name/en/' in production.
  */
 export function langPath(lang: string): string {
-  return `/${lang}/`;
+  const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+  return `${base}/${lang}/`;
 }
 
 /**

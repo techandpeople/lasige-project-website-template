@@ -1,4 +1,15 @@
 ---
-// Root redirect — update this if you change the default language in site-config.yaml
-return Astro.redirect('/en/');
+// Silent redirect to the default language.
+// Update 'en' here if you change defaultLanguage in site-config.yaml.
+const redirectUrl = import.meta.env.BASE_URL + 'en/';
 ---
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="refresh" content={`0;url=${redirectUrl}`} />
+    <link rel="canonical" href={redirectUrl} />
+    <script is:inline set:html={`location.replace(${JSON.stringify(redirectUrl)})`}></script>
+  </head>
+  <body></body>
+</html>
