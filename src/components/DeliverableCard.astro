@@ -93,11 +93,6 @@ const Tag = hasImage && deliverable.url ? 'a' : 'div';
 		class:list={["flex flex-col p-5 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow", isClickable && "cursor-pointer"]}
 		{...(isClickable ? { "data-popup-trigger": true } : {})}
 	>
-		{deliverable.url && (
-			<a href={deliverable.url} target="_blank" rel="noopener noreferrer" class="text-xs text-accent underline mb-1 self-end">
-				{ui.deliverables.open}
-			</a>
-		)}
 		<div class="flex items-center gap-2 mb-2">
 			<span class:list={["text-xs font-medium px-2 py-0.5 rounded-full", typeColors[typeName]]}>
 				{typeLabels[typeName]}
