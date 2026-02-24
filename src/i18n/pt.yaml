@@ -1,6 +1,8 @@
 nav:
   home: "Início"
   toggleMenu: "Alternar menu"
+  skipToContent: "Saltar para o conteúdo principal"
+  mainNav: "Navegação principal"
 
 deliverableTypes:
   publication: "Publicação"

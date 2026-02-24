@@ -9,9 +9,9 @@ interface Props {
 
 const { imageList, title, ui } = Astro.props;
 ---
-<section id="gallery" class="py-20">
+<section id="gallery" aria-labelledby="gallery-heading" class="py-20 min-h-screen flex flex-col justify-center">
 	<div class="max-w-6xl mx-auto px-4">
-		<h2 class="text-3xl md:text-4xl font-bold text-primary mb-4 text-center">{title}</h2>
+		<h2 id="gallery-heading" class="text-3xl md:text-4xl font-bold text-primary mb-4 text-center">{title}</h2>
 		<div class="w-16 h-1 bg-accent mx-auto mb-12 rounded-full"></div>
 
 		<div class="grid grid-cols-2 md:grid-cols-3 gap-2">
@@ -84,19 +84,23 @@ const { imageList, title, ui } = Astro.props;
 	}));
 
 	let current = 0;
+	let triggerIndex = 0;
 
 	function openLightbox(index: number) {
+		triggerIndex = index;
 		current = index;
 		showImage();
 		lightbox?.classList.remove('hidden');
 		lightbox?.classList.add('flex');
 		document.body.style.overflow = 'hidden';
+		document.getElementById('lightbox-close')?.focus();
 	}
 
 	function closeLightbox() {
 		lightbox?.classList.add('hidden');
 		lightbox?.classList.remove('flex');
 		document.body.style.overflow = '';
+		items[triggerIndex]?.focus();
 	}
 
 	function showImage() {
@@ -117,10 +121,26 @@ const { imageList, title, ui } = Astro.props;
 
 	lightbox?.addEventListener('click', (e) => { if (e.target === lightbox) closeLightbox(); });
 
-	document.addEventListener('keydown', (e) => {
-		if (!lightbox?.classList.contains('flex')) return;
-		if (e.key === 'Escape') closeLightbox();
-		if (e.key === 'ArrowLeft') prev();
-		if (e.key === 'ArrowRight') next();
+	lightbox?.addEventListener('keydown', (e) => {
+		if (!lightbox.classList.contains('flex')) return;
+		if (e.key === 'Escape') { closeLightbox(); return; }
+		if (e.key === 'ArrowLeft') { prev(); return; }
+		if (e.key === 'ArrowRight') { next(); return; }
+		// Focus trap: cycle Tab through close/prev/next buttons
+		if (e.key === 'Tab') {
+			const btns = [
+				document.getElementById('lightbox-close'),
+				document.getElementById('lightbox-prev'),
+				document.getElementById('lightbox-next'),
+			].filter(Boolean) as HTMLElement[];
+			const idx = btns.indexOf(document.activeElement as HTMLElement);
+			if (e.shiftKey) {
+				e.preventDefault();
+				btns[(idx - 1 + btns.length) % btns.length].focus();
+			} else {
+				e.preventDefault();
+				btns[(idx + 1) % btns.length].focus();
+			}
+		}
 	});
 </script>

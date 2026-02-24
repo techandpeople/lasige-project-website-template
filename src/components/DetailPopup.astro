@@ -10,7 +10,7 @@ interface Props {
 
 const { ui } = Astro.props;
 ---
-<div id="detail-overlay" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 p-4">
+<div id="detail-overlay" role="dialog" aria-modal="true" aria-labelledby="detail-title" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 p-4">
 	<div class="bg-white rounded-xl shadow-2xl w-full max-w-lg relative max-h-[80vh] overflow-y-auto">
 		<button
 			id="detail-close"
@@ -26,31 +26,56 @@ const { ui } = Astro.props;
 	const body = document.getElementById('detail-body');
 	const closeBtn = document.getElementById('detail-close');
 
-	function open(html: string) {
+	let lastTrigger: HTMLElement | null = null;
+
+	function open(html: string, trigger: HTMLElement) {
 		if (!body || !overlay) return;
+		lastTrigger = trigger;
 		body.innerHTML = html;
 		overlay.classList.remove('hidden');
 		overlay.classList.add('flex');
+		closeBtn?.focus();
 	}
 
 	function close() {
 		overlay?.classList.add('hidden');
 		overlay?.classList.remove('flex');
+		lastTrigger?.focus();
+		lastTrigger = null;
 	}
 
-	closeBtn?.addEventListener('click', close);
-	overlay?.addEventListener('click', (e) => {
-		if (e.target === overlay) close();
-	});
-	document.addEventListener('keydown', (e) => {
-		if (e.key === 'Escape') close();
+	// Focus trap
+	overlay?.addEventListener('keydown', (e) => {
+		if (e.key === 'Escape') { close(); return; }
+		if (e.key !== 'Tab' || !overlay.classList.contains('flex')) return;
+		const focusable = Array.from(
+			overlay.querySelectorAll<HTMLElement>('button, a[href], input, textarea, select, [tabindex]:not([tabindex="-1"])')
+		).filter(el => !el.hasAttribute('disabled'));
+		if (focusable.length === 0) return;
+		const first = focusable[0];
+		const last = focusable[focusable.length - 1];
+		if (e.shiftKey) {
+			if (document.activeElement === first) { e.preventDefault(); last.focus(); }
+		} else {
+			if (document.activeElement === last) { e.preventDefault(); first.focus(); }
+		}
 	});
 
-	document.querySelectorAll('[data-popup-trigger]').forEach((trigger) => {
+	closeBtn?.addEventListener('click', close);
+	overlay?.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+
+	document.querySelectorAll<HTMLElement>('[data-popup-trigger]').forEach((trigger) => {
 		trigger.addEventListener('click', (e) => {
 			e.preventDefault();
 			const content = trigger.querySelector('[data-popup-content]');
-			if (content) open(content.innerHTML);
+			if (content) open(content.innerHTML, trigger);
+		});
+		trigger.addEventListener('keydown', (e) => {
+			if (e.key === 'Enter' || e.key === ' ') {
+				e.preventDefault();
+				const content = trigger.querySelector('[data-popup-content]');
+				if (content) open(content.innerHTML, trigger);
+			}
 		});
 	});
 </script>

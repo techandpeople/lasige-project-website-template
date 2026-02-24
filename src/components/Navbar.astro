@@ -82,7 +82,13 @@ if (siteConfig.recruitment) {
 
 navItems.sort((a, b) => a.order - b.order);
 ---
-<nav id="navbar" class="fixed top-0 w-full z-50 bg-white/90 backdrop-blur-md shadow-sm">
+<a
+	href="#hero"
+	class="fixed top-0 left-4 z-[9999] px-4 py-2 rounded-b-md bg-primary text-white font-medium -translate-y-full focus:translate-y-0 transition-transform duration-150"
+>
+	{ui.nav.skipToContent}
+</a>
+<nav id="navbar" aria-label={ui.nav.mainNav} class="fixed top-0 w-full z-50 bg-white/90 backdrop-blur-md shadow-sm">
 	<div class="max-w-6xl mx-auto px-4 flex items-center justify-between h-16">
 		<a href="#hero" class="flex items-center gap-2">
 			{navigation?.logo && (
@@ -113,6 +119,8 @@ navItems.sort((a, b) => a.order - b.order);
 				id="menu-toggle"
 				class="hamburger p-2 text-body hover:text-primary"
 				aria-label={ui.nav.toggleMenu}
+				aria-expanded="false"
+				aria-controls="mobile-menu"
 			>
 				<span></span>
 				<span></span>
@@ -192,14 +200,34 @@ navItems.sort((a, b) => a.order - b.order);
 	const menu = document.getElementById('mobile-menu');
 
 	toggle?.addEventListener('click', () => {
-		toggle.classList.toggle('open');
+		const isOpen = toggle.classList.toggle('open');
 		menu?.classList.toggle('open');
+		toggle.setAttribute('aria-expanded', String(isOpen));
 	});
 
 	document.querySelectorAll('#mobile-menu a').forEach(link => {
 		link.addEventListener('click', () => {
 			toggle?.classList.remove('open');
 			menu?.classList.remove('open');
+			toggle?.setAttribute('aria-expanded', 'false');
 		});
 	});
+
+	// Active section → aria-current + active-nav class
+	const navLinks = document.querySelectorAll<HTMLAnchorElement>('.nav-link');
+	const sectionObserver = new IntersectionObserver(
+		(entries) => {
+			entries.forEach(entry => {
+				if (!entry.isIntersecting) return;
+				const id = entry.target.id;
+				navLinks.forEach(link => {
+					const isActive = link.getAttribute('href') === `#${id}`;
+					link.classList.toggle('active-nav', isActive);
+					link.setAttribute('aria-current', isActive ? 'true' : 'false');
+				});
+			});
+		},
+		{ rootMargin: '-45% 0px -45% 0px', threshold: 0 }
+	);
+	document.querySelectorAll<HTMLElement>('section[id]').forEach(el => sectionObserver.observe(el));
 </script>

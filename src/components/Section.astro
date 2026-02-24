@@ -7,9 +7,9 @@ interface Props {
 
 const { id, title, background = 'default' } = Astro.props;
 ---
-<section id={id} class:list={["py-20", background === 'surface' ? "bg-surface" : ""]}>
+<section id={id} aria-labelledby={`${id}-heading`} class:list={["py-20 min-h-screen flex flex-col justify-center", background === 'surface' ? "bg-surface" : ""]}>
 	<div class="max-w-3xl mx-auto px-4">
-		<h2 class="text-3xl md:text-4xl font-bold text-primary mb-4 text-center">
+		<h2 id={`${id}-heading`} class="text-3xl md:text-4xl font-bold text-primary mb-4 text-center">
 			{title}
 		</h2>
 		<div class="w-16 h-1 bg-accent mx-auto mb-12 rounded-full"></div>

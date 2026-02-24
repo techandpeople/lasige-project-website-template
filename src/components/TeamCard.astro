@@ -22,7 +22,7 @@ const initials = member.name.split(' ').map((n: string) => n[0]).join('').slice(
 ---
 <div
 	class:list={["flex flex-col items-center text-center p-6 bg-white rounded-2xl shadow-md hover:shadow-xl transition-shadow", hasBody && "cursor-pointer"]}
-	{...(hasBody ? { "data-popup-trigger": true } : {})}
+	{...(hasBody ? { "data-popup-trigger": true, role: "button", tabindex: "0" } : {})}
 >
 	{member.photo ? (
 		<img

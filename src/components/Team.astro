@@ -22,9 +22,9 @@ const rendered = await Promise.all(
 );
 ---
 {sorted.length > 0 && (
-	<section id="team" class="py-20">
+	<section id="team" aria-labelledby="team-heading" class="py-20 min-h-screen flex flex-col justify-center">
 		<div class="max-w-6xl mx-auto px-4">
-			<h2 class="text-3xl md:text-4xl font-bold text-primary mb-4 text-center">
+			<h2 id="team-heading" class="text-3xl md:text-4xl font-bold text-primary mb-4 text-center">
 				{title}
 			</h2>
 			<div class="w-16 h-1 bg-accent mx-auto mb-12 rounded-full"></div>
