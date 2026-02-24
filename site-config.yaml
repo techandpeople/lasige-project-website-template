@@ -85,7 +85,7 @@ deliverables:
 gallery:
   title: "Gallery"
   order: 80
-  style: "grid"   # "grid" or "carousel"
+  style: "carousel"   # "grid" or "carousel"
 
 # -- Team (optional) --
 # Team members are defined in content/team/<lang>/*.md

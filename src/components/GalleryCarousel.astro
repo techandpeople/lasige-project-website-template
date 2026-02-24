@@ -13,10 +13,11 @@ const { imageList, title, ui } = Astro.props;
 	<div class="max-w-6xl mx-auto px-4">
 		<h2 class="text-3xl md:text-4xl font-bold text-primary mb-4 text-center">{title}</h2>
 		<div class="w-16 h-1 bg-accent mx-auto mb-12 rounded-full"></div>
+	</div>
 
-		<div class="carousel-container relative overflow-hidden">
-			<!-- Slides -->
-			<div class="carousel-slides relative" style={`height: min(600px, 60vw)`}>
+	<div class="carousel-container relative overflow-hidden">
+		<!-- Slides -->
+		<div class="carousel-slides relative bg-surface" style={`height: min(600px, 60vw)`}>
 				{imageList.map((img, i) => (
 					<div
 						class:list={["carousel-slide absolute inset-0 transition-opacity duration-700 ease-in-out", i === 0 ? "opacity-100 z-10" : "opacity-0 z-0"]}
@@ -59,7 +60,6 @@ const { imageList, title, ui } = Astro.props;
 					</div>
 				</>
 			)}
-		</div>
 	</div>
 </section>
 
