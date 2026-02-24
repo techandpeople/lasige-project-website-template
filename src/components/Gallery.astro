@@ -15,11 +15,12 @@ const { ui, siteConfig } = Astro.props;
 const title = siteConfig.gallery?.title || 'Gallery';
 const style = siteConfig.gallery?.style || 'grid';
 
-const galleryDir = path.resolve('public/images/gallery');
+// Use import.meta.url for a reliable absolute path regardless of working directory
+const galleryUrl = new URL('../../public/images/gallery', import.meta.url);
 const extensions = new Set(['.jpg', '.jpeg', '.png', '.webp', '.gif', '.avif', '.svg']);
 
-const imageList = fs.existsSync(galleryDir)
-	? fs.readdirSync(galleryDir)
+const imageList = fs.existsSync(galleryUrl)
+	? fs.readdirSync(galleryUrl)
 		.filter((f: string) => extensions.has(path.extname(f).toLowerCase()))
 		.sort()
 		.map((f: string) => ({
