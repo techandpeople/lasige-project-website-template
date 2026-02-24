@@ -30,7 +30,7 @@ jobs:
       - name: Build
         env:
           SITE_URL: https://${{ github.repository_owner }}.github.io
-          BASE_PATH: /project-template
+          BASE_PATH: /${{ github.event.repository.name }}
         run: npm run build
 
       - uses: actions/upload-pages-artifact@v3
