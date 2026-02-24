@@ -9,6 +9,13 @@ interface Props {
 
 const { lang = 'en' } = Astro.props;
 const { project, colors } = site;
+
+// Presentation mode config — always available; site-config.yaml customises timings
+const rawPresentation = (site as any).presentation ?? {};
+const presConfig = {
+	defaultInterval: rawPresentation.defaultInterval ?? 5,
+	intervals: rawPresentation.intervals ?? {},
+};
 ---
 <!doctype html>
 <html lang={lang}>
@@ -20,6 +27,15 @@ const { project, colors } = site;
 		<meta name="generator" content={Astro.generator} />
 		<meta name="description" content={project.description} />
 		<title>{project.name}</title>
+		<!-- Open Graph / Social sharing -->
+		<meta property="og:title" content={project.name} />
+		<meta property="og:description" content={project.description} />
+		<meta property="og:type" content="website" />
+		<meta property="og:image" content={withBase('/og-image.png')} />
+		<meta property="og:image:width" content="1200" />
+		<meta property="og:image:height" content="630" />
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:image" content={withBase('/og-image.png')} />
 	</head>
 	<body class="bg-background text-body antialiased">
 		<Fragment set:html={`<style>
@@ -34,45 +50,206 @@ const { project, colors } = site;
 			}
 		</style>`} />
 		<slot />
-		<script>
-			// Arrow key / PageUp / PageDown navigation between sections and footer
-			const snapTargets = () => Array.from(
-				document.querySelectorAll<HTMLElement>('section[id], footer')
-			);
 
-			function currentIndex(): number {
-				const list = snapTargets();
-				const mid = window.innerHeight / 2;
-				return list.reduce((best, el, i) => {
-					const rect = el.getBoundingClientRect();
-					const dist = Math.abs(rect.top + rect.height / 2 - mid);
-					const bestRect = list[best].getBoundingClientRect();
-					const bestDist = Math.abs(bestRect.top + bestRect.height / 2 - mid);
-					return dist < bestDist ? i : best;
+		<!-- Presentation mode HUD (always in DOM, shown/hidden via JS) -->
+		<div
+			id="pres-hud"
+			class="hidden fixed bottom-0 inset-x-0 z-[9998] bg-black/80 backdrop-blur-sm"
+			role="status"
+			aria-live="polite"
+			aria-label="Presentation mode"
+		>
+			<div class="px-5 py-2.5 flex items-center gap-3 text-white text-sm">
+				<svg class="w-4 h-4 shrink-0 text-accent" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+					<path d="M2 3h20v14H2V3zm9 15h2v2h-2v-2zm-3 2h8v1H8v-1z"/>
+				</svg>
+				<span id="pres-section-name" class="flex-1 font-medium truncate text-white/90"></span>
+				<span id="pres-counter" class="tabular-nums text-white/50 text-xs shrink-0"></span>
+				<span id="pres-timer" class="tabular-nums text-accent font-bold w-6 text-right shrink-0"></span>
+				<button
+					id="pres-stop"
+					class="ml-1 text-white/40 hover:text-white transition-colors text-xl leading-none shrink-0"
+					aria-label="Exit presentation mode"
+				>✕</button>
+			</div>
+			<!-- Countdown progress bar -->
+			<div class="h-[3px] bg-white/10">
+				<div id="pres-bar" class="h-full bg-accent" style="width:100%"></div>
+			</div>
+		</div>
+
+		<!-- Navigation + Presentation mode -->
+		<!-- is:inline + define:vars so presConfig is baked in at build time (plain JS) -->
+		<script is:inline define:vars={{ presConfig }}>
+			// ── Shared scroll helper ─────────────────────────────────────────────────
+			function snapScrollTo(el) {
+				var navH = (document.getElementById('navbar') || {offsetHeight: 64}).offsetHeight;
+				var top = el.getBoundingClientRect().top + window.scrollY - navH;
+				window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+			}
+
+			function getTargets() {
+				return Array.from(document.querySelectorAll('section[id], footer'));
+			}
+
+			// Presentation excludes the footer — it's not a content slide
+			function getPresTargets() {
+				return Array.from(document.querySelectorAll('section[id]'));
+			}
+
+			function currentSnapIdx() {
+				var list = getTargets();
+				var mid = window.innerHeight / 2;
+				return list.reduce(function(best, el, i) {
+					var rect = el.getBoundingClientRect();
+					var dist = Math.abs(rect.top + rect.height / 2 - mid);
+					var bRect = list[best].getBoundingClientRect();
+					var bDist = Math.abs(bRect.top + bRect.height / 2 - mid);
+					return dist < bDist ? i : best;
 				}, 0);
 			}
 
-			function goTo(index: number) {
-				const list = snapTargets();
+			function goToIndex(index) {
+				var list = getTargets();
 				if (index < 0 || index >= list.length) return;
-				list[index].scrollIntoView({ behavior: 'smooth' });
+				snapScrollTo(list[index]);
 			}
 
-			document.addEventListener('keydown', (e) => {
-				// Only act when no interactive element has focus (screen reader safety)
-				const active = document.activeElement;
-				const isBody = !active || active === document.body || active === document.documentElement;
+			// ── Arrow key / PageUp / PageDown navigation ─────────────────────────────
+			document.addEventListener('keydown', function(e) {
+				if (window.__presMode) return; // presentation mode owns arrow keys
+				var active = document.activeElement;
+				var isBody = !active || active === document.body || active === document.documentElement;
 				if (!isBody) return;
-				// Also skip when a dialog/lightbox is open
 				if (document.querySelector('[role="dialog"]:not(.hidden)')) return;
+
+				var tag = active && active.tagName.toLowerCase();
+				if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
 
 				if (e.key === 'ArrowDown' || e.key === 'PageDown') {
 					e.preventDefault();
-					goTo(currentIndex() + 1);
+					goToIndex(currentSnapIdx() + 1);
 				} else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
 					e.preventDefault();
-					goTo(currentIndex() - 1);
+					goToIndex(currentSnapIdx() - 1);
 				}
+			});
+
+			// ── Presentation mode ────────────────────────────────────────────────────
+			window.__presMode = false;
+
+			var presTimerId = null;
+			var presRafId   = null;
+			var presIdx     = 0;
+			var presMs      = presConfig.defaultInterval * 1000;
+			var presStart   = 0;
+
+			var hud      = document.getElementById('pres-hud');
+			var hudName  = document.getElementById('pres-section-name');
+			var hudCtr   = document.getElementById('pres-counter');
+			var hudTimer = document.getElementById('pres-timer');
+			var hudBar   = document.getElementById('pres-bar');
+			var hudStop  = document.getElementById('pres-stop');
+
+			function getSectionMs(el) {
+				var id = el.id || 'footer';
+				var ov = presConfig.intervals[id];
+				return (ov != null ? ov : presConfig.defaultInterval) * 1000;
+			}
+
+			function updateHUD() {
+				var list = getPresTargets();
+				var el = list[presIdx];
+				if (!el) return;
+				var h2 = el.querySelector('h2');
+				var name = (h2 && h2.textContent && h2.textContent.trim()) || el.id;
+				if (hudName) hudName.textContent = name;
+				if (hudCtr)  hudCtr.textContent  = (presIdx + 1) + ' / ' + list.length;
+			}
+
+			function startCountdown() {
+				if (presRafId)   cancelAnimationFrame(presRafId);
+				if (presTimerId) clearTimeout(presTimerId);
+
+				var list = getPresTargets();
+				var el = list[presIdx];
+				if (!el) return;
+
+				presMs    = getSectionMs(el);
+				presStart = performance.now();
+
+				function tick(now) {
+					var elapsed   = now - presStart;
+					var remaining = Math.max(presMs - elapsed, 0);
+					var pct       = (remaining / presMs) * 100;
+					if (hudBar)   hudBar.style.width = pct + '%';
+					if (hudTimer) hudTimer.textContent = Math.ceil(remaining / 1000);
+					if (remaining > 0) presRafId = requestAnimationFrame(tick);
+				}
+				presRafId = requestAnimationFrame(tick);
+
+				presTimerId = setTimeout(function() {
+					var len = getPresTargets().length;
+					presIdx = (presIdx + 1) % len;
+					goToPresSection(presIdx);
+				}, presMs);
+			}
+
+			function goToPresSection(idx) {
+				var list = getPresTargets();
+				var el = list[idx];
+				if (!el) return;
+				snapScrollTo(el);
+				setTimeout(function() {
+					updateHUD();
+					startCountdown();
+				}, 900);
+			}
+
+			function enterPresentation() {
+				window.__presMode = true;
+				presIdx = 0; // always start from the hero
+				if (hud) hud.classList.remove('hidden');
+				document.documentElement.requestFullscreen && document.documentElement.requestFullscreen().catch(function(){});
+				goToPresSection(0);
+			}
+
+			function exitPresentation() {
+				window.__presMode = false;
+				if (hud) hud.classList.add('hidden');
+				if (presTimerId) clearTimeout(presTimerId);
+				if (presRafId)   cancelAnimationFrame(presRafId);
+				if (document.fullscreenElement) document.exitFullscreen && document.exitFullscreen();
+			}
+
+			document.addEventListener('keydown', function(e) {
+				var tag = document.activeElement && document.activeElement.tagName.toLowerCase();
+				if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
+
+				if (e.key === 'p' || e.key === 'P') {
+					e.preventDefault();
+					if (window.__presMode) exitPresentation();
+					else enterPresentation();
+					return;
+				}
+				if (!window.__presMode) return;
+				var len = getPresTargets().length;
+				if (e.key === 'Escape') { exitPresentation(); return; }
+				if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === 'PageDown') {
+					e.preventDefault();
+					presIdx = Math.min(presIdx + 1, len - 1);
+					goToPresSection(presIdx);
+				}
+				if (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || e.key === 'PageUp') {
+					e.preventDefault();
+					presIdx = Math.max(presIdx - 1, 0);
+					goToPresSection(presIdx);
+				}
+			});
+
+			if (hudStop) hudStop.addEventListener('click', exitPresentation);
+			document.addEventListener('fullscreenchange', function() {
+				if (!document.fullscreenElement && window.__presMode) exitPresentation();
 			});
 		</script>
 	</body>

@@ -2,6 +2,7 @@
 import { getCollection, render } from 'astro:content';
 import { type UIStrings, getLocalizedEntries } from '../i18n';
 import DeliverableCard from './DeliverableCard.astro';
+import DeliverableTimeline from './DeliverableTimeline.astro';
 
 interface Props {
 	lang: string;
@@ -14,6 +15,7 @@ const allDeliverables = await getCollection('deliverables');
 const deliverables = getLocalizedEntries(allDeliverables, lang);
 const sorted = [...deliverables].sort((a, b) => a.data.order - b.data.order);
 const title = siteConfig.deliverables?.title || 'Deliverables';
+const layout = siteConfig.deliverables?.layout ?? 'grid'; // 'grid' | 'timeline'
 
 const rendered = await Promise.all(
 	sorted.map(async (entry) => {
@@ -23,20 +25,24 @@ const rendered = await Promise.all(
 );
 ---
 {sorted.length > 0 && (
-	<section id="deliverables" aria-labelledby="deliverables-heading" class="py-20 min-h-screen flex flex-col justify-center bg-surface">
-		<div class="max-w-6xl mx-auto px-4">
-			<h2 id="deliverables-heading" class="text-3xl md:text-4xl font-bold text-primary mb-4 text-center">
-				{title}
-			</h2>
-			<div class="w-16 h-1 bg-accent mx-auto mb-12 rounded-full"></div>
+	layout === 'timeline' ? (
+		<DeliverableTimeline entries={rendered} title={title} ui={ui} />
+	) : (
+		<section id="deliverables" aria-labelledby="deliverables-heading" class="pt-24 pb-20 min-h-screen bg-surface">
+			<div class="max-w-6xl mx-auto px-4">
+				<h2 id="deliverables-heading" class="text-3xl md:text-4xl font-bold text-primary mb-4 text-center">
+					{title}
+				</h2>
+				<div class="w-16 h-1 bg-accent mx-auto mb-12 rounded-full"></div>
 
-			<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-				{rendered.map(({ entry, Content }) => (
-					<DeliverableCard deliverable={entry.data} hasBody={!!entry.body?.trim()} ui={ui}>
-						<Content />
-					</DeliverableCard>
-				))}
+				<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+					{rendered.map(({ entry, Content }) => (
+						<DeliverableCard deliverable={entry.data} hasBody={!!entry.body?.trim()} ui={ui}>
+							<Content />
+						</DeliverableCard>
+					))}
+				</div>
 			</div>
-		</div>
-	</section>
+		</section>
+	)
 )}

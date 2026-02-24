@@ -12,18 +12,16 @@
 
 html {
   scroll-behavior: smooth;
-  scroll-snap-type: y mandatory;
 }
 
-section[id],
-footer {
-  scroll-snap-align: start;
+/* Prevent fixed navbar from covering section headings on anchor scroll */
+section[id] {
+  scroll-margin-top: 4rem; /* = h-16 navbar height */
 }
 
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
-    scroll-snap-type: none;
   }
   *, *::before, *::after {
     animation-duration: 0.01ms !important;

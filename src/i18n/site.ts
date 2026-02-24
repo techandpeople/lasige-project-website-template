@@ -21,5 +21,8 @@ export function getSiteConfig(lang: string): Record<string, any> {
     recruitment: langOverrides.recruitment
       ? { ...site.recruitment, ...langOverrides.recruitment }
       : site.recruitment,
+    stats: langOverrides.stats
+      ? { ...(site as any).stats, ...langOverrides.stats }
+      : (site as any).stats,
   };
 }

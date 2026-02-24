@@ -143,6 +143,9 @@ navItems.sort((a, b) => a.order - b.order);
 			))}
 		</ul>
 	</div>
+
+	<!-- Scroll progress bar -->
+	<div id="scroll-progress" class="absolute bottom-0 left-0 h-[2px] w-0 bg-accent" aria-hidden="true"></div>
 </nav>
 
 <style>
@@ -196,6 +199,16 @@ navItems.sort((a, b) => a.order - b.order);
 </style>
 
 <script>
+	// Scroll progress bar
+	const progressBar = document.getElementById('scroll-progress') as HTMLElement | null;
+	if (progressBar) {
+		window.addEventListener('scroll', () => {
+			const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+			const pct = scrollable > 0 ? (window.scrollY / scrollable) * 100 : 0;
+			progressBar.style.width = `${pct}%`;
+		}, { passive: true });
+	}
+
 	const toggle = document.getElementById('menu-toggle');
 	const menu = document.getElementById('mobile-menu');
 
@@ -210,6 +223,18 @@ navItems.sort((a, b) => a.order - b.order);
 			toggle?.classList.remove('open');
 			menu?.classList.remove('open');
 			toggle?.setAttribute('aria-expanded', 'false');
+		});
+	});
+
+	// Instant jump on nav-link clicks (avoids scrolling through intermediate sections)
+	document.querySelectorAll<HTMLAnchorElement>('.nav-link').forEach(link => {
+		link.addEventListener('click', (e) => {
+			const href = link.getAttribute('href');
+			if (!href?.startsWith('#')) return;
+			e.preventDefault();
+			history.pushState(null, '', href);
+			const target = document.getElementById(href.slice(1));
+			target?.scrollIntoView({ behavior: 'instant', block: 'start' });
 		});
 	});
 

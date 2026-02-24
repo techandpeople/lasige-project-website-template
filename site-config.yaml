@@ -41,10 +41,45 @@ colors:
 navigation:
   # logo: "/images/logo.png"
 
+# -- Stats / Animated Counters (optional) --
+# A section with animated number counters.
+# Remove or comment out the entire block to disable the section.
+# stats:
+#   title: "By the Numbers"
+#   order: 5   # position in the page (0 = right after hero)
+#   items:
+#     - value: 150
+#       label: "Study Participants"
+#       suffix: "+"
+#     - value: 3
+#       label: "Publications"
+#     - value: 4
+#       label: "Years of Research"
+#     - value: 2
+#       label: "Software Releases"
+
+# -- Presentation Mode (optional) --
+# Press P to start / stop a fullscreen auto-advancing presentation.
+# defaultInterval: seconds each section is shown before auto-advancing.
+# intervals:      per-section overrides — key = section id (e.g. "hero", "gallery").
+# Remove or comment out this block to disable the P key shortcut entirely.
+# presentation:
+#   defaultInterval: 5
+#   intervals:
+#     hero: 8
+#     gallery: 15
+
+# -- Open Graph image (optional) --
+# Auto-generated from project.name / project.tagline / colors.
+# Override the background or add a logo:
+# og:
+#   bgColor: "#1a5276"   # defaults to colors.primary
+#   logo: "/images/logo.png"
+
 # -- Section Order (optional) --
 # List sections in the order they should appear on the page.
 # IDs: filename without .md (e.g. "about"), or fixed keys: deliverables, gallery,
-#       recruitment, team, funding.
+#       recruitment, stats, team, funding.
 # Sections not listed here appear after the listed ones, in their default order.
 sectionOrder:
   - about

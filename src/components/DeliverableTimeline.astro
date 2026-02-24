@@ -1,0 +1,187 @@
+---
+import { type UIStrings } from '../i18n';
+import { withBase } from '../utils/url';
+
+interface DeliverableData {
+	title: string;
+	description?: string;
+	type?: 'publication' | 'software' | 'dataset' | 'report' | 'other';
+	date?: string;
+	url?: string;
+	image?: string;
+}
+
+interface Props {
+	entries: { entry: { data: DeliverableData; body?: string }; Content: any }[];
+	title: string;
+	ui: UIStrings;
+}
+
+const { entries, title, ui } = Astro.props;
+
+const typeColors: Record<string, string> = {
+	publication: 'bg-blue-100 text-blue-800 border-blue-200',
+	software: 'bg-green-100 text-green-800 border-green-200',
+	dataset: 'bg-purple-100 text-purple-800 border-purple-200',
+	report: 'bg-amber-100 text-amber-800 border-amber-200',
+	other: 'bg-gray-100 text-gray-800 border-gray-200',
+};
+
+const dotColors: Record<string, string> = {
+	publication: 'bg-blue-500',
+	software: 'bg-green-500',
+	dataset: 'bg-purple-500',
+	report: 'bg-amber-500',
+	other: 'bg-gray-400',
+};
+---
+
+<section id="deliverables" aria-labelledby="deliverables-heading" class="pt-24 pb-20 min-h-screen bg-surface">
+	<div class="max-w-[100vw] px-4">
+		<div class="max-w-6xl mx-auto">
+			<h2 id="deliverables-heading" class="text-3xl md:text-4xl font-bold text-primary mb-4 text-center">{title}</h2>
+			<div class="w-16 h-1 bg-accent mx-auto mb-12 rounded-full"></div>
+		</div>
+
+		<!-- Horizontal scrollable timeline -->
+		<div
+			id="timeline-scroll"
+			class="overflow-x-auto pb-4 cursor-grab active:cursor-grabbing select-none"
+			role="region"
+			aria-label="Deliverables timeline — scroll horizontally"
+		>
+			<div id="timeline-inner" class="relative inline-flex items-center min-w-max px-16" style="height: 340px;">
+
+				<!-- Timeline axis line -->
+				<div class="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-0.5 bg-primary/20 pointer-events-none"></div>
+
+				<!-- Items -->
+				{entries.map(({ entry, Content }, i) => {
+					const d = entry.data;
+					const above = i % 2 === 0;
+					const typeName = d.type ?? 'other';
+					const isClickable = !!entry.body?.trim() && !d.url;
+					const isLink = !!d.url;
+					return (
+						<div class="relative flex flex-col items-center mx-5 w-44 shrink-0">
+							<!-- Card above (even) or spacer -->
+							{above ? (
+								<div
+									class:list={[
+										"mb-4 w-full rounded-xl border p-3 bg-white shadow-sm transition-shadow duration-200 hover:shadow-md",
+										(isClickable || isLink) ? "cursor-pointer" : "",
+									]}
+									{...(isClickable ? { "data-popup-trigger": true } : {})}
+								>
+									{d.image && (
+										<img src={withBase(d.image)} alt="" class="w-full h-20 object-cover rounded-md mb-2" />
+									)}
+									<span class:list={["text-[10px] font-semibold px-1.5 py-0.5 rounded-full border mb-1 inline-block", typeColors[typeName]]}>
+										{ui.deliverableTypes[typeName]}
+									</span>
+									{isLink ? (
+										<a href={d.url} target="_blank" rel="noopener noreferrer" class="block font-semibold text-xs text-primary hover:underline leading-snug">
+											{d.title}
+										</a>
+									) : (
+										<p class="font-semibold text-xs text-body leading-snug">{d.title}</p>
+									)}
+									{d.date && <p class="text-[10px] text-muted mt-0.5">{d.date}</p>}
+
+									{isClickable && (
+										<div data-popup-content class="hidden">
+											<div class="mb-4">
+												<span class:list={["text-xs font-medium px-2 py-0.5 rounded-full border", typeColors[typeName]]}>
+													{ui.deliverableTypes[typeName]}
+												</span>
+												{d.date && <span class="text-muted text-xs ml-2">{d.date}</span>}
+												<h2 class="text-xl font-bold text-primary mt-2">{d.title}</h2>
+											</div>
+											<div class="prose prose-lg max-w-none"><Content /></div>
+										</div>
+									)}
+								</div>
+							) : (
+								<div class="mb-4 h-[152px]" aria-hidden="true" />
+							)}
+
+							<!-- Dot -->
+							<div class:list={["w-4 h-4 rounded-full z-10 shrink-0 border-[3px] border-white shadow-sm", dotColors[typeName]]}></div>
+
+							<!-- Card below (odd) or spacer -->
+							{!above ? (
+								<div
+									class:list={[
+										"mt-4 w-full rounded-xl border p-3 bg-white shadow-sm transition-shadow duration-200 hover:shadow-md",
+										(isClickable || isLink) ? "cursor-pointer" : "",
+									]}
+									{...(isClickable ? { "data-popup-trigger": true } : {})}
+								>
+									{d.image && (
+										<img src={withBase(d.image)} alt="" class="w-full h-20 object-cover rounded-md mb-2" />
+									)}
+									<span class:list={["text-[10px] font-semibold px-1.5 py-0.5 rounded-full border mb-1 inline-block", typeColors[typeName]]}>
+										{ui.deliverableTypes[typeName]}
+									</span>
+									{isLink ? (
+										<a href={d.url} target="_blank" rel="noopener noreferrer" class="block font-semibold text-xs text-primary hover:underline leading-snug">
+											{d.title}
+										</a>
+									) : (
+										<p class="font-semibold text-xs text-body leading-snug">{d.title}</p>
+									)}
+									{d.date && <p class="text-[10px] text-muted mt-0.5">{d.date}</p>}
+
+									{isClickable && (
+										<div data-popup-content class="hidden">
+											<div class="mb-4">
+												<span class:list={["text-xs font-medium px-2 py-0.5 rounded-full border", typeColors[typeName]]}>
+													{ui.deliverableTypes[typeName]}
+												</span>
+												{d.date && <span class="text-muted text-xs ml-2">{d.date}</span>}
+												<h2 class="text-xl font-bold text-primary mt-2">{d.title}</h2>
+											</div>
+											<div class="prose prose-lg max-w-none"><Content /></div>
+										</div>
+									)}
+								</div>
+							) : (
+								<div class="mt-4 h-[152px]" aria-hidden="true" />
+							)}
+						</div>
+					);
+				})}
+			</div>
+		</div>
+	</div>
+</section>
+
+<script>
+	// Mouse drag-to-scroll on timeline
+	const scroller = document.getElementById('timeline-scroll');
+	if (scroller) {
+		let isDragging = false;
+		let startX = 0;
+		let scrollLeft = 0;
+
+		scroller.addEventListener('mousedown', (e) => {
+			isDragging = true;
+			startX = e.pageX - scroller.offsetLeft;
+			scrollLeft = scroller.scrollLeft;
+		});
+		window.addEventListener('mouseup', () => { isDragging = false; });
+		scroller.addEventListener('mousemove', (e) => {
+			if (!isDragging) return;
+			e.preventDefault();
+			const x = e.pageX - scroller.offsetLeft;
+			scroller.scrollLeft = scrollLeft - (x - startX);
+		});
+
+		// Horizontal arrow keys when timeline is focused
+		scroller.setAttribute('tabindex', '0');
+		scroller.addEventListener('keydown', (e) => {
+			if (e.key === 'ArrowRight') { e.preventDefault(); scroller.scrollBy({ left: 200, behavior: 'smooth' }); }
+			if (e.key === 'ArrowLeft')  { e.preventDefault(); scroller.scrollBy({ left: -200, behavior: 'smooth' }); }
+		});
+	}
+</script>

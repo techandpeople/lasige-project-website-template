@@ -12,6 +12,7 @@ import Deliverables from '../../components/Deliverables.astro';
 import Funding from '../../components/Funding.astro';
 import Gallery from '../../components/Gallery.astro';
 import RecruitmentSection from '../../components/RecruitmentSection.astro';
+import Stats from '../../components/Stats.astro';
 import Footer from '../../components/Footer.astro';
 import ContactPopup from '../../components/ContactPopup.astro';
 import DetailPopup from '../../components/DetailPopup.astro';
@@ -55,7 +56,8 @@ type PageBlock =
 	| { type: 'deliverables'; order: number }
 	| { type: 'gallery'; order: number }
 	| { type: 'funding'; order: number }
-	| { type: 'recruitment'; order: number };
+	| { type: 'recruitment'; order: number }
+	| { type: 'stats'; order: number };
 
 const blocks: PageBlock[] = [
 	...contentSections.map((entry: (typeof contentSections)[number]) => ({
@@ -79,6 +81,9 @@ if (funderEntries.length > 0) {
 }
 if (siteConfig.recruitment) {
 	blocks.push({ type: 'recruitment', order: getOrder('recruitment', siteConfig.recruitment?.order ?? 85) });
+}
+if (siteConfig.stats?.items?.length) {
+	blocks.push({ type: 'stats', order: getOrder('stats', siteConfig.stats?.order ?? 5) });
 }
 
 blocks.sort((a, b) => a.order - b.order);
@@ -106,6 +111,7 @@ blocks.sort((a, b) => a.order - b.order);
 			if (block.type === 'team') return <Team lang={lang} siteConfig={siteConfig} />;
 			if (block.type === 'funding') return <Funding lang={lang} siteConfig={siteConfig} />;
 			if (block.type === 'recruitment') return <RecruitmentSection ui={ui} siteConfig={siteConfig} />;
+			if (block.type === 'stats') return <Stats stats={siteConfig.stats.items} title={siteConfig.stats.title} />;
 		})}
 	</main>
 	<Footer siteConfig={siteConfig} />

@@ -14,19 +14,23 @@ npm run build      # generates dist/
 
 Everything you need to edit is at the project root — no need to touch `src/`.
 
-### 1. Project settings (`site.yaml`)
+### 1. Project settings (`site-config.yaml`)
 
 Edit this file to configure:
 
 - **Project name, tagline and description** (`project`)
 - **Colors** (`colors`) — all values are CSS colors (hex, rgb, hsl)
 - **Navigation logo** (`navigation.logo`)
-- **Hero banner** (`hero`) — title, subtitle, logo, background image, CTA button
-- **Deliverables section title and position** (`deliverables`) — optional
-- **Gallery section title and position** (`gallery`) — optional
-- **Team section title and position** (`team`) — optional
-- **Funding section title and description** (`funding`) — optional
-- **Section ordering** (`sectionOrder`) — optional, centralised ordering
+- **Hero banner** (`hero`) — title, subtitle, logo, background image, CTA button, optional secondary CTA
+- **Deliverables section** (`deliverables`) — title, position, layout (`grid` or `timeline`)
+- **Gallery section** (`gallery`) — title, position, style (`grid` or `carousel`)
+- **Team section** (`team`) — title, position
+- **Funding section** (`funding`) — title, position
+- **Stats counters** (`stats`) — animated number counters with optional prefix/suffix
+- **Recruitment section** (`recruitment`) — inline form for study participant sign-ups
+- **Presentation mode** (`presentation`) — per-section timing for the P key slideshow
+- **Open Graph image** (`og`) — custom background color and logo for social previews
+- **Section ordering** (`sectionOrder`) — centralised ordering of all sections
 - **Footer** (`footer`) — institution logo, contact email, social links, copyright
 
 ### 2. Content sections (`content/sections/`)
@@ -55,18 +59,35 @@ Each `.md` file = one deliverable. Create a file per deliverable (e.g. `d1-1.md`
 title: "D1.1 — Project Report"
 type: "report"              # publication | software | dataset | report | other
 date: "2025-06"             # optional delivery date
-url: "https://example.com"  # optional link
+url: "https://example.com"  # optional link (clicking the card opens this URL)
+image: "/images/d1-1.png"   # optional thumbnail image
 order: 1
 ---
-```
 
-The Deliverables section only appears if there are files in `content/deliverables/`. Delete all files to hide it.
+Optional longer description — shown in a popup when the card is clicked (only if no `url` is set).
+```
 
 Available types: `publication`, `software`, `dataset`, `report`, `other`.
 
+**Layouts** — set `deliverables.layout` in `site-config.yaml`:
+
+| Value | Description |
+|-------|-------------|
+| `grid` (default) | Responsive card grid with lightbox popups |
+| `timeline` | Horizontal scrollable timeline, alternating cards above/below the axis |
+
+The Deliverables section only appears if there are files in `content/deliverables/`.
+
 ### 4. Gallery (`public/images/gallery/`)
 
-Place images (`.jpg`, `.jpeg`, `.png`, `.webp`, `.gif`, `.avif`) in `public/images/gallery/` and they will appear **automatically** in a slideshow with navigation arrows and autoplay.
+Place images (`.jpg`, `.jpeg`, `.png`, `.webp`, `.gif`, `.avif`) in `public/images/gallery/` and they will appear **automatically**.
+
+**Styles** — set `gallery.style` in `site-config.yaml`:
+
+| Value | Description |
+|-------|-------------|
+| `carousel` (default) | Full-width fade carousel with autoplay and prev/next buttons |
+| `grid` | Responsive image grid; clicking any image opens a full-screen lightbox with keyboard navigation |
 
 The Gallery section only appears if there are images in the folder. Remove all images to hide it.
 
@@ -89,7 +110,7 @@ links:
 ---
 ```
 
-The Team section only appears if there are files in `content/team/`. Delete all files to hide it.
+The Team section only appears if there are files in `content/team/`.
 
 ### 6. Funders (`content/funders/`)
 
@@ -105,27 +126,124 @@ order: 1
 ---
 ```
 
-The Funding section only appears if there are files in `content/funders/`. Delete all files to hide it.
+The Funding section only appears if there are files in `content/funders/`.
 
-### 7. Section ordering (`sectionOrder`)
+### 7. Stats counters
 
-Control the order of **all** sections from a single place in `site.yaml`:
+Add animated number counters to your site by enabling the `stats` block in `site-config.yaml`:
+
+```yaml
+stats:
+  title: "By the Numbers"   # optional section heading
+  order: 25
+  items:
+    - value: 12
+      label: "Researchers"
+    - value: 5
+      label: "Publications"
+    - value: 3
+      label: "Years"
+      suffix: "+"
+    - value: 100
+      label: "Funded"
+      prefix: "€"
+      suffix: "k"
+```
+
+Counters animate with an ease-out curve when they scroll into view. Respects `prefers-reduced-motion`.
+
+### 8. Recruitment section
+
+Add a participant sign-up form directly on the page:
+
+```yaml
+recruitment:
+  title: "Participate in Our Study"
+  description: "We are looking for participants..."
+  order: 85
+  endpoint: "https://formspree.io/f/YOUR_FORM_ID"
+  successMessage: "Thank you! We'll be in touch."
+  fields:
+    - name: "name"
+      label: "Name"
+      type: "text"
+      required: true
+    - name: "email"
+      label: "Email"
+      type: "email"
+      required: true
+    - name: "availability"
+      label: "Availability"
+      type: "textarea"
+      required: false
+```
+
+Supported field types: `text`, `email`, `number`, `tel`, `textarea`.
+
+Add a secondary hero button that links to this section:
+
+```yaml
+hero:
+  secondaryCta:
+    label: "Join Our Study"
+    href: "#recruitment"
+```
+
+### 9. Presentation mode (P key)
+
+Press **P** on any page to enter a fullscreen auto-advancing slideshow of all sections.
+
+- **Arrow keys** — navigate manually while in presentation mode
+- **Escape** — exit presentation mode
+- Press **P** again to exit
+
+Configure per-section timing in `site-config.yaml`:
+
+```yaml
+presentation:
+  defaultInterval: 10       # seconds per section (default: 5)
+  intervals:
+    hero: 5
+    about: 15
+    deliverables: 20
+    gallery: 10
+```
+
+The section id matches the `id` attribute of the `<section>` element (filename without `.md` for content sections, or the built-in names: `hero`, `deliverables`, `gallery`, `stats`, `team`, `funding`, `recruitment`).
+
+### 10. Open Graph image
+
+A `/og-image.png` (1200×630 px) is generated at build time for social sharing previews. Customize it in `site-config.yaml`:
+
+```yaml
+og:
+  bgColor: "#1a5276"        # defaults to colors.primary
+  logo: "/images/logo.png"  # optional logo overlaid on the image
+```
+
+The image automatically uses your project name, tagline, and accent color stripe.
+
+### 11. Section ordering (`sectionOrder`)
+
+Control the order of **all** sections from a single place in `site-config.yaml`:
 
 ```yaml
 sectionOrder:
-  about: 10
-  objectives: 20
-  deliverables: 30
-  gallery: 80
-  team: 90
-  funding: 95
+  - about
+  - objectives
+  - stats
+  - deliverables
+  - gallery
+  - recruitment
+  - team
+  - funding
 ```
 
-The key is the section id (filename without `.md` extension, or the built-in name: `deliverables`, `gallery`, `team`, `funding`). Lower values appear first. This overrides the `order` field in individual section frontmatter and section configs.
+Built-in section ids: `hero`, `deliverables`, `gallery`, `stats`, `team`, `funding`, `recruitment`. Content sections use the filename without `.md`.
 
-### 8. Contact form (`contact`)
+### 12. Contact form (`contact`)
 
-A floating button opens a contact popup. Configure it in `site.yaml`:
+A floating button opens a contact popup. Configure it in `site-config.yaml`:
 
 ```yaml
 contact:
@@ -137,7 +255,7 @@ contact:
 
 The form submits to [Formspree](https://formspree.io) (or any compatible service). Remove or comment out the `contact` block to disable it entirely.
 
-### 9. Images (`public/images/`)
+### 13. Images (`public/images/`)
 
 Place all images in `public/images/` and reference them by path:
 
@@ -149,11 +267,12 @@ public/images/
   lasige-logo.png       # footer institution logo
   team/                 # team member photos
   funders/              # funder logos
+  gallery/              # gallery images (auto-detected)
 ```
 
-### 10. Colors
+### 14. Colors
 
-Edit the `colors` block in `site.yaml`:
+Edit the `colors` block in `site-config.yaml`:
 
 ```yaml
 colors:
@@ -166,24 +285,37 @@ colors:
   textLight: "#6b7280"    # muted/secondary text
 ```
 
+## Multilingual support
+
+Duplicate content into language-specific subfolders:
+
+```
+content/
+  en/
+    sections/about.md
+    team/jane.md
+  pt/
+    sections/about.md
+    team/jane.md
+```
+
+Add the language to `site-config.yaml` under `i18n` with translated labels and section config overrides.
+
 ## Project Structure
 
 ```
-site.yaml                # Central configuration
+site-config.yaml         # Central configuration
 content/
-  sections/              # Markdown sections (auto-added to page)
-    about.md
-    objectives.md
-  deliverables/          # Deliverables (one .md per item)
-    example.md
-  team/                  # Team members (one .md per person)
-    pi.md
-  funders/               # Funders (one .md per entity)
-    funder.md
+  en/                    # English content
+    sections/            # Markdown sections (auto-added to page)
+    deliverables/        # Deliverables (one .md per item)
+    team/                # Team members (one .md per person)
+    funders/             # Funders (one .md per entity)
+  pt/                    # Portuguese content (optional)
 src/                     # Source code (no need to touch)
 public/
   images/                # All project images
-    gallery/             # Gallery images (auto-detected slideshow)
+    gallery/             # Gallery images (auto-detected)
 ```
 
 ## Commands
@@ -194,3 +326,12 @@ public/
 | `npm run dev` | Dev server at `localhost:4321` |
 | `npm run build` | Build to `./dist/` |
 | `npm run preview` | Preview build locally |
+
+## Keyboard shortcuts
+
+| Key | Action |
+|-----|--------|
+| `P` | Toggle fullscreen presentation mode |
+| `↑` / `↓` | Jump between sections (when not in presentation mode) |
+| `←` / `→` | Navigate sections in presentation mode |
+| `Escape` | Exit presentation mode |
